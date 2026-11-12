@@ -13,7 +13,10 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -22,6 +25,8 @@ import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Movie
 import androidx.compose.material.icons.outlined.VideoCall
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
@@ -42,6 +47,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -54,6 +61,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.media3.common.MediaItem
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.PlayerView
+import coil.compose.AsyncImage
+import com.pokervision.core.domain.media.Keyframe
 import com.pokervision.core.model.media.MediaAsset
 import com.pokervision.core.ui.component.EmptyState
 import com.pokervision.core.ui.component.ErrorBanner
@@ -125,7 +134,7 @@ fun VideoListRoute(
                                         ).joinToString(" · "),
                                     )
                                 },
-                                leadingContent = { Icon(Icons.Outlined.Movie, contentDescription = null) },
+                                leadingContent = { VideoThumbnail(asset) },
                                 colors = ListItemDefaults.colors(containerColor = MaterialTheme.colorScheme.background),
                                 modifier = Modifier.clickable { onOpenVideo(asset.id) },
                             )
@@ -140,6 +149,8 @@ fun VideoListRoute(
 @Composable
 fun VideoDetailRoute(onBack: () -> Unit, viewModel: VideoDetailViewModel = hiltViewModel()) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val keyframes by viewModel.keyframes.collectAsStateWithLifecycle()
+    val seek by viewModel.seek.collectAsStateWithLifecycle()
     var confirmDelete by remember { mutableStateOf(false) }
 
     LaunchedEffect(state) { if (state is VideoDetailState.Deleted) onBack() }
@@ -165,7 +176,14 @@ fun VideoDetailRoute(onBack: () -> Unit, viewModel: VideoDetailViewModel = hiltV
                 VideoDetailState.Loading, VideoDetailState.Deleted ->
                     CircularProgressIndicator(Modifier.align(Alignment.Center))
                 is VideoDetailState.Failed -> ErrorBanner(s.error.userMessage(), Modifier.padding(16.dp))
-                is VideoDetailState.Loaded -> VideoDetailContent(s.asset)
+                is VideoDetailState.Loaded -> VideoDetailContent(
+                    asset = s.asset,
+                    keyframes = keyframes,
+                    seek = seek,
+                    onExtract = viewModel::startExtraction,
+                    onCancel = viewModel::cancelExtraction,
+                    onKeyframeClick = viewModel::seekTo,
+                )
             }
         }
     }
@@ -186,12 +204,19 @@ fun VideoDetailRoute(onBack: () -> Unit, viewModel: VideoDetailViewModel = hiltV
 }
 
 @Composable
-private fun VideoDetailContent(asset: MediaAsset) {
+private fun VideoDetailContent(
+    asset: MediaAsset,
+    keyframes: KeyframeUiState,
+    seek: SeekRequest?,
+    onExtract: () -> Unit,
+    onCancel: () -> Unit,
+    onKeyframeClick: (Long) -> Unit,
+) {
     Column(
         Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        VideoPlayer(asset)
+        VideoPlayer(asset, seek)
         Text(asset.displayName, style = MaterialTheme.typography.titleMedium)
         Text(
             listOfNotNull(
@@ -202,13 +227,108 @@ private fun VideoDetailContent(asset: MediaAsset) {
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
-        PlannedFeatureNotice(phase = 8, description = stringResource(R.string.video_analysis_planned))
+        KeyframeSection(keyframes, onExtract, onCancel, onKeyframeClick)
+        PlannedFeatureNotice(phase = 3, description = stringResource(R.string.video_analysis_planned))
+    }
+}
+
+@Composable
+private fun VideoThumbnail(asset: MediaAsset) {
+    val thumb = asset.thumbnailPath
+    if (thumb != null) {
+        AsyncImage(
+            model = File(thumb),
+            contentDescription = null,
+            contentScale = ContentScale.Crop,
+            modifier = Modifier.size(width = 72.dp, height = 48.dp).clip(RoundedCornerShape(6.dp)),
+        )
+    } else {
+        Icon(Icons.Outlined.Movie, contentDescription = null, modifier = Modifier.size(48.dp))
+    }
+}
+
+@Composable
+private fun KeyframeSection(
+    state: KeyframeUiState,
+    onExtract: () -> Unit,
+    onCancel: () -> Unit,
+    onKeyframeClick: (Long) -> Unit,
+) {
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text(stringResource(R.string.video_keyframes_title), style = MaterialTheme.typography.titleMedium)
+        Text(
+            stringResource(R.string.video_keyframes_help),
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        val frames: List<Keyframe> = when (state) {
+            is KeyframeUiState.Idle -> state.saved
+            is KeyframeUiState.Running -> state.keyframes
+            is KeyframeUiState.Done -> state.keyframes
+            is KeyframeUiState.Failed -> state.partial
+        }
+        when (state) {
+            is KeyframeUiState.Running -> {
+                if (state.total > 0) {
+                    LinearProgressIndicator(
+                        progress = { state.sampled.toFloat() / state.total },
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                } else {
+                    LinearProgressIndicator(Modifier.fillMaxWidth())
+                }
+                Text(
+                    stringResource(R.string.video_keyframes_progress, state.sampled, state.total, state.keyframes.size),
+                    style = MaterialTheme.typography.bodySmall,
+                )
+                OutlinedButton(onClick = onCancel) { Text(stringResource(R.string.video_keyframes_cancel)) }
+            }
+            is KeyframeUiState.Done -> {
+                Text(
+                    stringResource(R.string.video_keyframes_done, state.keyframes.size, state.sampled),
+                    style = MaterialTheme.typography.bodySmall,
+                )
+                if (state.undecodable > 0) {
+                    Text(
+                        stringResource(R.string.video_keyframes_undecodable, state.undecodable),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.error,
+                    )
+                }
+                OutlinedButton(onClick = onExtract) { Text(stringResource(R.string.video_keyframes_rerun)) }
+            }
+            is KeyframeUiState.Failed -> {
+                ErrorBanner(state.error.userMessage())
+                Button(onClick = onExtract) { Text(stringResource(R.string.video_keyframes_extract)) }
+            }
+            is KeyframeUiState.Idle -> Button(onClick = onExtract) {
+                Text(stringResource(if (state.saved.isEmpty()) R.string.video_keyframes_extract else R.string.video_keyframes_rerun))
+            }
+        }
+        if (frames.isNotEmpty()) {
+            LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                items(frames, key = { it.timestampMs }) { kf ->
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier = Modifier.clickable { onKeyframeClick(kf.timestampMs) },
+                    ) {
+                        AsyncImage(
+                            model = File(kf.imagePath),
+                            contentDescription = stringResource(R.string.video_keyframe_at, formatDuration(kf.timestampMs)),
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier.size(width = 128.dp, height = 80.dp).clip(RoundedCornerShape(6.dp)),
+                        )
+                        Text(formatDuration(kf.timestampMs), style = MaterialTheme.typography.labelSmall)
+                    }
+                }
+            }
+        }
     }
 }
 
 /** Plays a local file with Media3. Pauses when the screen goes to background; released on dispose. */
 @Composable
-private fun VideoPlayer(asset: MediaAsset) {
+private fun VideoPlayer(asset: MediaAsset, seek: SeekRequest?) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
     val player = remember(asset.localPath) {
@@ -225,6 +345,12 @@ private fun VideoPlayer(asset: MediaAsset) {
         onDispose {
             lifecycleOwner.lifecycle.removeObserver(observer)
             player.release()
+        }
+    }
+    LaunchedEffect(seek) {
+        seek?.let {
+            player.seekTo(it.positionMs)
+            player.pause()
         }
     }
     // Local copies: smart casts don't apply to properties declared in another module.

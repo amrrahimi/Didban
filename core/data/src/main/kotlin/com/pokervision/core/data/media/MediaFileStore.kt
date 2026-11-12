@@ -1,10 +1,11 @@
 package com.pokervision.core.data.media
 
 import android.content.Context
-import android.graphics.BitmapFactory
 import android.media.MediaMetadataRetriever
 import android.net.Uri
 import android.provider.OpenableColumns
+import com.pokervision.core.media.BitmapOps
+import com.pokervision.core.media.VideoThumbnailer
 import com.pokervision.core.model.media.MediaType
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.io.File
@@ -23,6 +24,7 @@ data class MediaMetadata(val width: Int?, val height: Int?, val durationMillis: 
 @Singleton
 class MediaFileStore @Inject constructor(
     @ApplicationContext private val context: Context,
+    private val thumbnailer: VideoThumbnailer,
 ) {
     private val root: File get() = File(context.filesDir, ROOT_DIR)
 
@@ -60,15 +62,17 @@ class MediaFileStore @Inject constructor(
         MediaType.VIDEO -> readVideoMetadata(file)
     }
 
+    /** Dimensions as displayed: EXIF orientation applied (a portrait photo reports portrait size). */
     private fun readImageMetadata(file: File): MediaMetadata {
-        val options = BitmapFactory.Options().apply { inJustDecodeBounds = true }
-        BitmapFactory.decodeFile(file.absolutePath, options)
-        // Note: dimensions are as stored; EXIF orientation is not applied yet (see KNOWN_LIMITATIONS).
-        return MediaMetadata(
-            width = options.outWidth.takeIf { it > 0 },
-            height = options.outHeight.takeIf { it > 0 },
-            durationMillis = null,
-        )
+        val info = BitmapOps.readImageInfo(file.absolutePath)
+        return MediaMetadata(width = info?.size?.width, height = info?.size?.height, durationMillis = null)
+    }
+
+    /** Writes a preview for a video into `media/thumbs`; returns its path or null on failure. */
+    fun createVideoThumbnail(video: File): String? {
+        val dir = File(root, "thumbs").apply { mkdirs() }
+        val target = File(dir, video.nameWithoutExtension + ".jpg")
+        return if (thumbnailer.create(video.absolutePath, target.absolutePath)) target.absolutePath else null
     }
 
     private fun readVideoMetadata(file: File): MediaMetadata {

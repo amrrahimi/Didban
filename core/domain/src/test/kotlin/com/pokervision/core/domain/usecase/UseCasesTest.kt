@@ -78,8 +78,10 @@ class UseCasesTest {
         val mediaRepo = FakeMediaRepository(listOf(media(1, MediaType.IMAGE)))
         val gameRepo = FakeGameRepository(listOf(game), hands = 3)
         val settingsRepo = FakeSettingsRepository(AppSettings(analysisFps = 10))
-        val result = ClearAllLocalDataUseCase(mediaRepo, gameRepo, settingsRepo)()
+        val keyframes = RecordingKeyframeStore()
+        val result = ClearAllLocalDataUseCase(mediaRepo, gameRepo, settingsRepo, keyframes)()
         assertEquals(AppResult.Success(Unit), result)
+        assertTrue("cached keyframes wiped", keyframes.clearedAll)
         assertTrue(mediaRepo.items.value.isEmpty())
         assertTrue(gameRepo.games.value.isEmpty())
         assertEquals(AppSettings(), settingsRepo.current)
@@ -89,9 +91,17 @@ class UseCasesTest {
     fun `clear all continues after a failure and reports it`() = runBlocking {
         val mediaRepo = FakeMediaRepository(listOf(media(1, MediaType.IMAGE))).apply { failDeleteAll = true }
         val gameRepo = FakeGameRepository(listOf(game))
-        val result = ClearAllLocalDataUseCase(mediaRepo, gameRepo, FakeSettingsRepository())()
+        val result = ClearAllLocalDataUseCase(mediaRepo, gameRepo, FakeSettingsRepository(), RecordingKeyframeStore())()
         assertTrue(result.errorOrNull() is AppError.Io)
         assertTrue("games still cleared", gameRepo.games.value.isEmpty())
+    }
+
+    @Test
+    fun `deleting media also clears its keyframes`() = runBlocking {
+        val keyframes = RecordingKeyframeStore()
+        val repo = FakeMediaRepository(listOf(media(5, MediaType.VIDEO)))
+        assertTrue(DeleteMediaUseCase(repo, keyframes)(5).isSuccess)
+        assertEquals(listOf(5L), keyframes.cleared)
     }
 
     @Test

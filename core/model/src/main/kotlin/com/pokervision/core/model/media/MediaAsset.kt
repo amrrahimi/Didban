@@ -18,5 +18,7 @@ data class MediaAsset(
     val height: Int? = null,
     /** Videos only. */
     val durationMillis: Long? = null,
+    /** Small preview image (videos only); null if none could be generated. */
+    val thumbnailPath: String? = null,
     val createdAtMillis: Long,
 )

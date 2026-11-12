@@ -3,6 +3,7 @@ package com.pokervision.core.database
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
 import com.pokervision.core.database.dao.GameDao
 import com.pokervision.core.database.dao.HandHistoryDao
 import com.pokervision.core.database.dao.MediaAssetDao
@@ -21,7 +22,7 @@ abstract class PokerVisionDatabase : RoomDatabase() {
     abstract fun handHistoryDao(): HandHistoryDao
 
     companion object {
-        const val VERSION = 1
+        const val VERSION = 2
         const val NAME = "poker_vision.db"
     }
 }
@@ -35,5 +36,13 @@ abstract class PokerVisionDatabase : RoomDatabase() {
  * Destructive fallback is intentionally NOT enabled: user history must never be dropped silently.
  */
 object PokerVisionMigrations {
-    val ALL: Array<Migration> = emptyArray()
+
+    /** v2: video thumbnails. Existing rows get NULL (the UI falls back to an icon). */
+    val MIGRATION_1_2 = object : Migration(1, 2) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            db.execSQL("ALTER TABLE media_assets ADD COLUMN thumbnail_path TEXT")
+        }
+    }
+
+    val ALL: Array<Migration> = arrayOf(MIGRATION_1_2)
 }

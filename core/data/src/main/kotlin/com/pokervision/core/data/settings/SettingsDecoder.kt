@@ -3,6 +3,7 @@ package com.pokervision.core.data.settings
 import com.pokervision.core.model.confidence.ConfidenceThresholds
 import com.pokervision.core.model.game.PokerVariant
 import com.pokervision.core.model.settings.AppSettings
+import com.pokervision.core.model.settings.KeyframeSensitivity
 
 /**
  * Converts raw stored values into a valid [AppSettings]. Any missing, unknown or out-of-range value
@@ -14,6 +15,8 @@ object SettingsDecoder {
         analysisFps: Int?,
         minimumDetection: Float?,
         autoConfirm: Float?,
+        videoSampleIntervalMs: Long? = null,
+        keyframeSensitivityName: String? = null,
     ): AppSettings {
         val defaults = AppSettings()
         val variant = PokerVariant.entries.firstOrNull { it.name == variantName } ?: defaults.defaultVariant
@@ -28,6 +31,10 @@ object SettingsDecoder {
             defaultVariant = variant,
             analysisFps = fps,
             confidenceThresholds = thresholds,
+            videoSampleIntervalMs = videoSampleIntervalMs?.takeIf { it in AppSettings.VIDEO_SAMPLE_INTERVALS_MS }
+                ?: defaults.videoSampleIntervalMs,
+            keyframeSensitivity = KeyframeSensitivity.entries.firstOrNull { it.name == keyframeSensitivityName }
+                ?: defaults.keyframeSensitivity,
         )
     }
 }

@@ -12,6 +12,7 @@ import com.pokervision.core.model.media.MediaAsset
 import com.pokervision.core.model.media.MediaOrigin
 import com.pokervision.core.model.media.MediaType
 import com.pokervision.core.model.settings.AppSettings
+import com.pokervision.core.model.settings.KeyframeSensitivity
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
@@ -84,7 +85,18 @@ class FakeSettingsRepository(initial: AppSettings = AppSettings()) : SettingsRep
     override suspend fun setConfidenceThresholds(minimumDetection: Float, autoConfirm: Float) {
         state.value = state.value.copy(confidenceThresholds = ConfidenceThresholds(minimumDetection, autoConfirm))
     }
+    override suspend fun setVideoSampleInterval(intervalMs: Long) { state.value = state.value.copy(videoSampleIntervalMs = intervalMs) }
+    override suspend fun setKeyframeSensitivity(sensitivity: KeyframeSensitivity) { state.value = state.value.copy(keyframeSensitivity = sensitivity) }
     override suspend fun resetToDefaults() { state.value = AppSettings() }
+}
+
+class RecordingKeyframeStore : com.pokervision.core.domain.media.KeyframeStore {
+    val cleared = mutableListOf<Long>()
+    var clearedAll = false
+    override fun pathFor(assetId: Long, timestampMs: Long) = "/cache/$assetId/$timestampMs.jpg"
+    override fun clear(assetId: Long) { cleared += assetId }
+    override fun clearAll() { clearedAll = true }
+    override fun list(assetId: Long) = emptyList<com.pokervision.core.domain.media.Keyframe>()
 }
 
 fun media(id: Long, type: MediaType, createdAt: Long = id, origin: MediaOrigin = MediaOrigin.USER_IMPORT) = MediaAsset(

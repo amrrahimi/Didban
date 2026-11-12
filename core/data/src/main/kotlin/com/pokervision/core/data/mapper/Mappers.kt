@@ -28,6 +28,7 @@ internal fun MediaAssetEntity.toModelOrNull(): MediaAsset? {
         height = height,
         durationMillis = durationMillis,
         createdAtMillis = createdAtMillis,
+        thumbnailPath = thumbnailPath,
     )
 }
 
@@ -43,6 +44,7 @@ internal fun MediaAsset.toEntity() = MediaAssetEntity(
     height = height,
     durationMillis = durationMillis,
     createdAtMillis = createdAtMillis,
+    thumbnailPath = thumbnailPath,
 )
 
 internal fun GameEntity.toModelOrNull(): PokerGame? {

@@ -62,6 +62,7 @@ dependencies {
     implementation(project(":core:domain"))
     implementation(project(":core:data"))
     implementation(project(":core:database"))
+    implementation(project(":core:media"))
     implementation(project(":feature:home"))
     implementation(project(":feature:camera"))
     implementation(project(":feature:imageanalysis"))

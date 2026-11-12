@@ -93,9 +93,10 @@ private fun MediaList(media: List<MediaAsset>, onOpen: (MediaAsset) -> Unit, onD
                 headlineContent = { Text(asset.displayName) },
                 supportingContent = { Text("${formatDateTime(asset.createdAtMillis)} · ${formatBytes(asset.sizeBytes)}") },
                 leadingContent = {
-                    if (asset.type == MediaType.IMAGE) {
+                    val preview = if (asset.type == MediaType.IMAGE) asset.localPath else asset.thumbnailPath
+                    if (preview != null) {
                         AsyncImage(
-                            model = File(asset.localPath),
+                            model = File(preview),
                             contentDescription = null,
                             contentScale = ContentScale.Crop,
                             modifier = Modifier.size(48.dp).clip(RoundedCornerShape(6.dp)),

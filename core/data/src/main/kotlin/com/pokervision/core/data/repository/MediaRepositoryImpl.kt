@@ -87,6 +87,7 @@ class MediaRepositoryImpl @Inject constructor(
         displayName: String,
     ): AppResult<MediaAsset> {
         val meta = store.readMetadata(file, type)
+        val thumbnail = if (type == MediaType.VIDEO) store.createVideoThumbnail(file) else null
         val asset = MediaAsset(
             type = type,
             origin = origin,
@@ -98,6 +99,7 @@ class MediaRepositoryImpl @Inject constructor(
             height = meta.height,
             durationMillis = meta.durationMillis,
             createdAtMillis = System.currentTimeMillis(),
+            thumbnailPath = thumbnail,
         )
         return try {
             val id = dao.insert(asset.toEntity())
@@ -106,6 +108,7 @@ class MediaRepositoryImpl @Inject constructor(
         } catch (e: Exception) {
             if (e is kotlin.coroutines.cancellation.CancellationException) throw e
             file.delete()
+            thumbnail?.let { store.delete(it) }
             logger.e(TAG, "DB insert failed; file removed", e)
             AppResult.Failure(AppError.Io("Could not save media record", e))
         }
@@ -115,6 +118,7 @@ class MediaRepositoryImpl @Inject constructor(
         val entity = dao.getById(id) ?: return@withContext AppResult.Failure(AppError.NotFound("Media $id"))
         dao.deleteById(id)
         if (!store.delete(entity.localPath)) logger.w(TAG, "File not deleted: ${entity.localPath}")
+        entity.thumbnailPath?.let { store.delete(it) }
         AppResult.Success(Unit)
     }
 

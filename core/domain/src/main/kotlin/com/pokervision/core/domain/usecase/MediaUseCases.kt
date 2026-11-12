@@ -2,6 +2,7 @@ package com.pokervision.core.domain.usecase
 
 import com.pokervision.core.common.result.AppError
 import com.pokervision.core.common.result.AppResult
+import com.pokervision.core.domain.media.KeyframeStore
 import com.pokervision.core.domain.repository.MediaRepository
 import com.pokervision.core.model.media.MediaAsset
 import com.pokervision.core.model.media.MediaOrigin
@@ -42,6 +43,13 @@ class RegisterCapturedMediaUseCase @Inject constructor(private val repository: M
     }
 }
 
-class DeleteMediaUseCase @Inject constructor(private val repository: MediaRepository) {
-    suspend operator fun invoke(id: Long): AppResult<Unit> = repository.delete(id)
+class DeleteMediaUseCase @Inject constructor(
+    private val repository: MediaRepository,
+    private val keyframeStore: KeyframeStore,
+) {
+    suspend operator fun invoke(id: Long): AppResult<Unit> {
+        val result = repository.delete(id)
+        if (result.isSuccess) keyframeStore.clear(id)
+        return result
+    }
 }

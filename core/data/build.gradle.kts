@@ -25,6 +25,7 @@ android {
 dependencies {
     api(project(":core:domain"))
     implementation(project(":core:database"))
+    implementation(project(":core:media"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.datastore.preferences)

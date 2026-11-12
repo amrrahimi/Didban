@@ -2,6 +2,7 @@ package com.pokervision.core.data.settings
 
 import com.pokervision.core.model.game.PokerVariant
 import com.pokervision.core.model.settings.AppSettings
+import com.pokervision.core.model.settings.KeyframeSensitivity
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
@@ -19,6 +20,16 @@ class SettingsDecoderTest {
         assertEquals(8, s.analysisFps)
         assertEquals(0.4f, s.confidenceThresholds.minimumDetection)
         assertEquals(0.95f, s.confidenceThresholds.autoConfirm)
+    }
+
+    @Test
+    fun `video settings decode with fallback`() {
+        val ok = SettingsDecoder.decode(null, null, null, null, 500L, "HIGH")
+        assertEquals(500L, ok.videoSampleIntervalMs)
+        assertEquals(KeyframeSensitivity.HIGH, ok.keyframeSensitivity)
+        val bad = SettingsDecoder.decode(null, null, null, null, 333L, "NOPE")
+        assertEquals(AppSettings.DEFAULT_VIDEO_SAMPLE_INTERVAL_MS, bad.videoSampleIntervalMs)
+        assertEquals(KeyframeSensitivity.MEDIUM, bad.keyframeSensitivity)
     }
 
     @Test

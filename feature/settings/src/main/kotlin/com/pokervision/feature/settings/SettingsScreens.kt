@@ -20,11 +20,15 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SegmentedButton
+import androidx.compose.material3.SegmentedButtonDefaults
+import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -43,6 +47,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.pokervision.core.model.game.PokerVariant
 import com.pokervision.core.model.settings.AppSettings
+import com.pokervision.core.model.settings.KeyframeSensitivity
 import com.pokervision.core.ui.component.ErrorBanner
 import com.pokervision.core.ui.component.PlannedFeatureNotice
 import com.pokervision.core.ui.component.PokerTopBar
@@ -50,6 +55,7 @@ import com.pokervision.core.ui.component.StatusChip
 import com.pokervision.core.ui.text.formatBytes
 import com.pokervision.core.ui.text.label
 import com.pokervision.core.ui.text.userMessage
+import java.util.Locale
 import kotlin.math.roundToInt
 
 @Composable
@@ -136,8 +142,53 @@ fun DetectionSettingsRoute(onBack: () -> Unit, viewModel: SettingsViewModel = hi
                 value = s.confidenceThresholds.autoConfirm,
                 onCommit = { viewModel.setThresholds(s.confidenceThresholds.minimumDetection, it, editedMinimum = false) },
             )
+            Text(stringResource(R.string.settings_video_section), style = MaterialTheme.typography.titleLarge)
+            ChoiceRow(
+                title = stringResource(R.string.settings_video_interval),
+                help = stringResource(R.string.settings_video_interval_help),
+                options = AppSettings.VIDEO_SAMPLE_INTERVALS_MS.map { ms ->
+                    ms to stringResource(R.string.settings_seconds, String.format(Locale.getDefault(), "%.1f", ms / 1000.0))
+                },
+                selected = s.videoSampleIntervalMs,
+                onSelect = { viewModel.setVideoSampleInterval(it) },
+            )
+            ChoiceRow(
+                title = stringResource(R.string.settings_keyframe_sensitivity),
+                help = stringResource(R.string.settings_keyframe_sensitivity_help),
+                options = listOf(
+                    KeyframeSensitivity.LOW to stringResource(R.string.settings_sensitivity_low),
+                    KeyframeSensitivity.MEDIUM to stringResource(R.string.settings_sensitivity_medium),
+                    KeyframeSensitivity.HIGH to stringResource(R.string.settings_sensitivity_high),
+                ),
+                selected = s.keyframeSensitivity,
+                onSelect = { viewModel.setKeyframeSensitivity(it) },
+            )
             OutlinedButton(onClick = viewModel::resetDetectionDefaults) { Text(stringResource(R.string.settings_reset_defaults)) }
         }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun <T> ChoiceRow(
+    title: String,
+    help: String,
+    options: List<Pair<T, String>>,
+    selected: T,
+    onSelect: (T) -> Unit,
+) {
+    Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+        Text(title, style = MaterialTheme.typography.titleMedium)
+        SingleChoiceSegmentedButtonRow(Modifier.fillMaxWidth()) {
+            options.forEachIndexed { index, (value, label) ->
+                SegmentedButton(
+                    selected = value == selected,
+                    onClick = { onSelect(value) },
+                    shape = SegmentedButtonDefaults.itemShape(index, options.size),
+                ) { Text(label, maxLines = 1) }
+            }
+        }
+        Text(help, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
     }
 }
 

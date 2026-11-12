@@ -26,6 +26,8 @@ data class MediaAssetEntity(
     val height: Int?,
     @ColumnInfo(name = "duration_ms") val durationMillis: Long?,
     @ColumnInfo(name = "created_at") val createdAtMillis: Long,
+    /** Added in schema v2. */
+    @ColumnInfo(name = "thumbnail_path") val thumbnailPath: String? = null,
 )
 
 @Entity(

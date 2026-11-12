@@ -9,5 +9,14 @@
     <string name="video_cancel">انصراف</string>
     <string name="video_delete_confirm_title">این ویدیو حذف شود؟</string>
     <string name="video_delete_confirm_body">نسخهٔ ذخیره‌شده در این برنامه برای همیشه پاک می‌شود. فایل اصلی در گالری شما تغییری نمی‌کند.</string>
-    <string name="video_analysis_planned">استخراج فریم، انتخاب فریم‌های کلیدی، تشخیص کارت در طول زمان و بازبینی خط زمانی برنامه‌ریزی شده‌اند. فعلاً فقط پخش.</string>
+    <string name="video_analysis_planned">تشخیص کارت روی فریم‌های کلیدی همراه با مدل تشخیص اضافه می‌شود. بازبینی خط زمانی همراه با اصلاح در فاز ۸ می‌آید.</string>
+    <string name="video_keyframes_title">فریم‌های کلیدی</string>
+    <string name="video_keyframes_help">ویدیو با نرخ تعیین‌شده در تنظیمات «مدل و تشخیص» نمونه‌برداری می‌شود و فقط فریم‌هایی که میز در آن‌ها به‌وضوح تغییر کرده نگه داشته می‌شوند. برای رفتن به هر لحظه روی فریمش بزنید.</string>
+    <string name="video_keyframes_extract">استخراج فریم‌های کلیدی</string>
+    <string name="video_keyframes_rerun">استخراج دوباره</string>
+    <string name="video_keyframes_cancel">توقف</string>
+    <string name="video_keyframes_progress">%1$d از %2$d فریم بررسی شد · %3$d فریم کلیدی</string>
+    <string name="video_keyframes_done">%1$d فریم کلیدی از %2$d فریم نمونه‌برداری‌شده</string>
+    <string name="video_keyframes_undecodable">%1$d فریم قابل رمزگشایی نبود و رد شد.</string>
+    <string name="video_keyframe_at">فریم کلیدی در %1$s</string>
 </resources>

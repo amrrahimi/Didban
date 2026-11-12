@@ -33,6 +33,7 @@ include(":core:domain")
 include(":core:database")
 include(":core:data")
 include(":core:ui")
+include(":core:media")
 
 // Feature modules
 include(":feature:home")

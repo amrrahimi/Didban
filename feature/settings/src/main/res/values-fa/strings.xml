@@ -18,6 +18,15 @@
     <string name="settings_auto_confirm">اطمینان تأیید خودکار</string>
     <string name="settings_auto_confirm_help">تشخیص‌های برابر یا بیشتر از این مقدار بدون بازبینی شما قابل تأییدند. هر چیزی بین این دو مقدار نامطمئن نمایش داده می‌شود و باید تأیید یا اصلاح شود.</string>
     <string name="settings_reset_defaults">بازگشت به پیش‌فرض</string>
+    <string name="settings_video_section">تحلیل ویدیو</string>
+    <string name="settings_video_interval">نمونه‌برداری هر</string>
+    <string name="settings_video_interval_help">هر چند وقت یک فریم هنگام استخراج فریم‌های کلیدی بررسی شود. فاصلهٔ کوتاه‌تر حرکت‌های سریع را می‌گیرد ولی زمان بیشتری می‌برد.</string>
+    <string name="settings_seconds">%1$s ثانیه</string>
+    <string name="settings_keyframe_sensitivity">حساسیت فریم کلیدی</string>
+    <string name="settings_keyframe_sensitivity_help">میز چقدر باید تغییر کند تا فریم کلیدی جدیدی نگه داشته شود. حساسیت بالا برگشتن حتی یک کارت را هم می‌گیرد.</string>
+    <string name="settings_sensitivity_low">کم</string>
+    <string name="settings_sensitivity_medium">متوسط</string>
+    <string name="settings_sensitivity_high">زیاد</string>
 
     <string name="settings_privacy_title">حریم خصوصی و فضای ذخیره‌سازی</string>
     <string name="settings_privacy_fact_local">تصاویر و ویدیوها روی همین دستگاه پردازش می‌شوند.</string>

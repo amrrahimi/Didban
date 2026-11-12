@@ -9,6 +9,7 @@ import com.pokervision.core.domain.usecase.ClearAllLocalDataUseCase
 import com.pokervision.core.domain.usecase.GetStorageUsageUseCase
 import com.pokervision.core.model.game.PokerVariant
 import com.pokervision.core.model.settings.AppSettings
+import com.pokervision.core.model.settings.KeyframeSensitivity
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -49,10 +50,20 @@ class SettingsViewModel @Inject constructor(
         repository.setConfidenceThresholds(m, a)
     }
 
+    fun setVideoSampleInterval(intervalMs: Long) = viewModelScope.launch {
+        if (intervalMs in AppSettings.VIDEO_SAMPLE_INTERVALS_MS) repository.setVideoSampleInterval(intervalMs)
+    }
+
+    fun setKeyframeSensitivity(sensitivity: KeyframeSensitivity) = viewModelScope.launch {
+        repository.setKeyframeSensitivity(sensitivity)
+    }
+
     fun resetDetectionDefaults() = viewModelScope.launch {
         val d = AppSettings()
         repository.setAnalysisFps(d.analysisFps)
         repository.setConfidenceThresholds(d.confidenceThresholds.minimumDetection, d.confidenceThresholds.autoConfirm)
+        repository.setVideoSampleInterval(d.videoSampleIntervalMs)
+        repository.setKeyframeSensitivity(d.keyframeSensitivity)
     }
 }
 
