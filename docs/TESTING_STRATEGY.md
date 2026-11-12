@@ -13,8 +13,8 @@
 | `PlayingCardTest`, `GameStateValidatorTest`, `ModelInvariantsTest` | 34 | passing |
 | `UseCasesTest` | 8 | passing |
 | `SettingsDecoderTest` | 3 | passing |
-| `SettingsViewModelTest`, `RoutesTest` | 6 | not yet run |
-| `DaoTest`, `MigrationTest`, `HomeScreenTest` (instrumented) | 6 | not yet run |
+| `SettingsViewModelTest`, `RoutesTest` | 6 | passing (CI) |
+| `DaoTest`, `MigrationTest`, `HomeScreenTest` (instrumented) | 6 | passing (CI emulator, API 30) |
 
 ## Rules
 - Every bug fix gets a regression test.

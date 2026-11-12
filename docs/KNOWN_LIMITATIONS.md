@@ -1,8 +1,7 @@
 # Known Limitations
 
 ## Build status
-- **The Android modules have not been compiled yet.** They were written in an environment without the Android SDK or Google Maven access. Pure-Kotlin modules (`core:common`, `core:model`, `core:domain`) and `SettingsDecoder` were compiled and their 53 unit tests pass. Expect to fix small compile issues on first `./gradlew assembleDebug`.
-- `core/database/schemas/1.json` is generated on the first build and must be committed before any schema change.
+- Builds and all automated tests pass in GitHub Actions. Camera, import and playback have not yet been checked by hand on a real phone (emulator camera is not representative).
 
 ## Functional (by design for phase 1)
 - No card detection: no model exists yet. The camera samples frames at the configured rate and only measures throughput.
