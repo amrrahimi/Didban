@@ -11,10 +11,11 @@
 |---|---|---|
 | `FrameRateLimiterTest` | 8 | passing |
 | `PlayingCardTest`, `GameStateValidatorTest`, `ModelInvariantsTest` | 34 | passing |
-| `UseCasesTest` | 8 | passing |
-| `SettingsDecoderTest` | 3 | passing |
-| `SettingsViewModelTest`, `RoutesTest` | 6 | passing (CI) |
-| `DaoTest`, `MigrationTest`, `HomeScreenTest` (instrumented) | 6 | passing (CI emulator, API 30) |
+| `UseCasesTest` | 9 | passing |
+| `FrameSamplingTest`, `ExtractKeyframesUseCaseTest` | 20 | passing |
+| `SettingsDecoderTest` | 4 | passing |
+| `SettingsViewModelTest`, `RoutesTest` | 7 | passing (CI) |
+| `DaoTest`, `MigrationTest` (incl. 1→2), `BitmapOpsTest`, `HomeScreenTest` (instrumented) | 12 | passing (CI emulator, API 30) |
 
 ## Rules
 - Every bug fix gets a regression test.

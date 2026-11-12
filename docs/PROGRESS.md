@@ -25,11 +25,22 @@ CI: GitHub Actions on branch `poker-vision` runs all unit tests, builds the APK,
 
 **Phase 1 exit criterion still open:** manual check on a real phone (camera capture/recording, import, playback, Persian RTL, delete-all).
 
+## Phase 2 — Camera, image and video input ✅ (CI green)
+
+| Item | Status | Verification |
+|---|---|---|
+| Frame sampling plan (configurable interval, cap of 600 samples) | ✅ | `FrameSamplingTest` |
+| Keyframe selection (32×32 luma fingerprint, min/max gap, 3 sensitivities) | ✅ | `FrameSamplingTest`, `ExtractKeyframesUseCaseTest` (progress, cancel, undecodable frames) |
+| Video frame decoding (MediaMetadataRetriever, OPTION_CLOSEST, scaled on API 27+) | 🟡 | needs a real-phone check with a recorded game |
+| Image utilities: EXIF orientation, subsampled decode, resize, rotate, luma, atomic JPEG | ✅ | `BitmapOpsTest` on emulator |
+| Keyframe cache (locale-safe filenames, cleared on delete / delete-all) | ✅ | `BitmapOpsTest` (Persian locale), `UseCasesTest` |
+| Room v2: video thumbnails, `MIGRATION_1_2` | ✅ | `MigrationTest` 1→2 preserves rows; schema 2 committed |
+| UI: keyframe filmstrip with seek, thumbnails in lists, video settings | 🟡 | `SettingsViewModelTest`; manual check pending |
+
 ## Next
 
 | Phase | Scope |
 |---|---|
-| 2 | Frame extraction from video (MediaMetadataRetriever / MediaCodec), keyframe sampling, EXIF orientation, resize/rotate utilities, configurable processing rate for video |
 | 3 | `:core:vision`: `CardDetector` interface, clearly labelled mock, LiteRT/ONNX runtime, YOLO post-processing (NMS), IoU tracker; `ml/` training pipeline |
 | 4 | Game-state reconstruction, temporal agreement for confirmation, manual correction UI |
 | 5 | Texas Hold'em evaluator (7-card best-5), exhaustive tests |

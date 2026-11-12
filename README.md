@@ -2,7 +2,7 @@
 
 Offline poker analysis for **education, training and post-game review**: capture or import table photos and videos, recognise cards (planned), reconstruct game state and compute probabilities with deterministic poker math. Not intended for real-time assistance where it is prohibited.
 
-**Status: Phase 1 (foundation).** See [docs/PROGRESS.md](docs/PROGRESS.md) and [docs/KNOWN_LIMITATIONS.md](docs/KNOWN_LIMITATIONS.md).
+**Status: Phase 2 complete (camera, image and video input incl. keyframe extraction).** See [docs/PROGRESS.md](docs/PROGRESS.md) and [docs/KNOWN_LIMITATIONS.md](docs/KNOWN_LIMITATIONS.md).
 
 ## What works in Phase 1 (code complete, awaiting first Android build)
 - Home dashboard with live counts and navigation to all 10 screens

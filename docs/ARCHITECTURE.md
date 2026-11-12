@@ -23,9 +23,10 @@ Dependencies always point inward: `feature → domain → model/common`. `data` 
 |---|---|---|
 | `:core:common` | Kotlin/JVM | `AppResult`/`AppError`, `AppLogger`, `FrameRateLimiter`, `ThroughputMeter` |
 | `:core:model` | Kotlin/JVM | Cards, deck types, confidence, `GameState`, `CardSlot`, detection & equity result types, `GameStateValidator` |
-| `:core:domain` | Kotlin/JVM | Repository interfaces, use cases, `MediaTypePolicy` |
+| `:core:domain` | Kotlin/JVM | Repository interfaces, use cases, `MediaTypePolicy`, frame sampling / keyframe selection / resize math, `ExtractKeyframesUseCase` |
 | `:core:database` | Android lib | Room DB v1: `media_assets`, `games`, `hand_histories`; DAOs; migration policy |
 | `:core:data` | Android lib | Repository implementations, `MediaFileStore`, DataStore settings, Hilt bindings, `AndroidLogger` |
+| `:core:media` | Android lib | Video frame reader (MediaMetadataRetriever), `BitmapOps` (EXIF, resize, rotate, luma fingerprint, atomic JPEG), keyframe cache, video thumbnails |
 | `:core:ui` | Android lib | Dark poker theme, shared components (confidence indicator, planned-feature notice, card view), formatting, shared strings |
 | `:feature:home` | Android lib | Dashboard (screen 1) |
 | `:feature:camera` | Android lib | CameraX preview / photo / video / throttled analysis stream (screen 2) |
