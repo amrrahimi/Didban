@@ -11,6 +11,7 @@
 *.apk
 *.aab
 *.keystore
+!app/debug.keystore
 *.jks
 # ML artifacts are tracked separately (see docs/ML_PIPELINE.md)
 /ml/datasets/

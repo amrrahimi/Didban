@@ -14,11 +14,23 @@ android {
         applicationId = "com.pokervision.app"
         minSdk = 26
         targetSdk = 35
-        versionCode = 1
+        // CI build number, so each new APK installs as an update over the previous one.
+        versionCode = System.getenv("GITHUB_RUN_NUMBER")?.toIntOrNull() ?: 1
         versionName = "0.1.0-phase1"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         // Only ship the languages the app is translated into (keep in sync with res/xml/locales_config.xml).
         resourceConfigurations += listOf("en", "fa")
+    }
+
+    signingConfigs {
+        // Fixed, non-secret debug key committed to the repo: every CI-built test APK has the same
+        // signature, so Android accepts it as an update instead of refusing to install.
+        getByName("debug") {
+            storeFile = file("debug.keystore")
+            storePassword = "android"
+            keyAlias = "androiddebugkey"
+            keyPassword = "android"
+        }
     }
 
     buildTypes {
