@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="camera_title">Live Camera</string>
+    <string name="camera_permission_rationale">Camera access is needed to preview the table and capture photos or videos. Frames are processed on this device only and nothing is uploaded.</string>
+    <string name="camera_permission_grant">Allow camera</string>
+    <string name="camera_permission_settings">Open app settings</string>
+    <string name="camera_mode_photo">Photo</string>
+    <string name="camera_mode_video">Video</string>
+    <string name="camera_take_photo">Take photo</string>
+    <string name="camera_start_recording">Start recording</string>
+    <string name="camera_stop_recording">Stop recording</string>
+    <string name="camera_switch_lens">Switch camera</string>
+    <string name="camera_recording">Recording %1$s (no audio)</string>
+    <string name="camera_saved_photo">Photo saved to Image Analysis</string>
+    <string name="camera_saved_video">Video saved to Video Analysis</string>
+    <string name="camera_error_bind">Could not start the camera. Close other camera apps and try again.</string>
+    <string name="camera_error_capture">Capture failed. Please try again.</string>
+    <string name="camera_diagnostics">Analysis %1$s / %2$d FPS · %3$d×%4$d · %5$d°</string>
+    <string name="camera_detection_planned">Card detection is not active yet. Frames are sampled at the configured rate and measured only.</string>
+</resources>

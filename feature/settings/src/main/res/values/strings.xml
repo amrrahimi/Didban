@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="settings_cancel">Cancel</string>
+
+    <string name="settings_variant_title">Game Variant</string>
+    <string name="settings_variant_board_desc">%1$d hole cards · %2$d board cards · up to %3$d players · %4$d-card deck</string>
+    <string name="settings_variant_noboard_desc">%1$d cards per player · no board · up to %2$d players · %3$d-card deck</string>
+    <string name="settings_variant_engines_planned">Hand evaluation arrives first for Texas Hold\'em (phase 5); Omaha, Omaha Hi-Lo, Stud, Draw and Short Deck engines follow in phase 9. The selection is already used for game-state validation rules.</string>
+
+    <string name="settings_detection_title">Model &amp; Detection</string>
+    <string name="settings_model_title">Detection model</string>
+    <string name="settings_model_none">No model installed</string>
+    <string name="settings_model_none_desc">A trained card-detection model is not bundled yet. The app will not show card detections until one is installed. No mock results are displayed.</string>
+    <string name="settings_fps">Analysis rate: %1$d FPS</string>
+    <string name="settings_fps_help">How many camera frames per second are analysed. Higher values react faster but use more battery.</string>
+    <string name="settings_min_confidence">Minimum detection confidence</string>
+    <string name="settings_min_confidence_help">Detections below this are ignored as noise.</string>
+    <string name="settings_auto_confirm">Auto-confirm confidence</string>
+    <string name="settings_auto_confirm_help">Detections at or above this can be confirmed without your review. Anything between the two values is shown as uncertain and must be confirmed or corrected.</string>
+    <string name="settings_reset_defaults">Reset to defaults</string>
+
+    <string name="settings_privacy_title">Privacy &amp; Storage</string>
+    <string name="settings_privacy_fact_local">Images and video are processed on this device.</string>
+    <string name="settings_privacy_fact_network">The app does not request internet access; nothing is uploaded.</string>
+    <string name="settings_privacy_fact_private_storage">Imported and captured media is copied into private app storage, invisible to other apps.</string>
+    <string name="settings_privacy_fact_audio">Video is recorded without audio; the microphone is never used.</string>
+    <string name="settings_storage_used">Media storage used: %1$s</string>
+    <string name="settings_delete_all">Delete all data</string>
+    <string name="settings_delete_all_confirm_title">Delete all app data?</string>
+    <string name="settings_delete_all_confirm_body">All stored images, videos, games and hand histories will be permanently deleted and settings reset. Originals in your gallery are not affected.</string>
+    <string name="settings_cleared">All local data deleted.</string>
+    <string name="settings_export_planned">Exporting your game history (hand histories and reports) is planned together with statistics.</string>
+</resources>

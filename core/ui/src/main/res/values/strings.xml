@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="ui_back">Back</string>
+    <string name="ui_confidence_high">High</string>
+    <string name="ui_confidence_medium">Medium</string>
+    <string name="ui_confidence_low">Low</string>
+    <string name="ui_confidence_description">Confidence %1$s, %2$d percent</string>
+    <string name="ui_planned_title">Planned for development phase %1$d</string>
+    <string name="ui_delete">Delete</string>
+    <string name="ui_cancel">Cancel</string>
+
+    <string name="variant_texas_holdem">Texas Hold\'em</string>
+    <string name="variant_omaha">Omaha</string>
+    <string name="variant_omaha_hi_lo">Omaha Hi-Lo</string>
+    <string name="variant_seven_card_stud">Seven Card Stud</string>
+    <string name="variant_five_card_draw">Five Card Draw</string>
+    <string name="variant_short_deck">Short Deck (6+)</string>
+
+    <string name="error_io">Could not read or write the file. Check available storage and try again.</string>
+    <string name="error_not_found">The item no longer exists.</string>
+    <string name="error_validation">This file type is not supported.</string>
+    <string name="error_permission">Permission is required for this action.</string>
+    <string name="error_unsupported">This device does not support the requested feature.</string>
+    <string name="error_unknown">Something went wrong. Please try again.</string>
+</resources>

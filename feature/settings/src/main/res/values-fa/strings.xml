@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="settings_cancel">انصراف</string>
+
+    <string name="settings_variant_title">نوع بازی</string>
+    <string name="settings_variant_board_desc">%1$d کارت دست · %2$d کارت زمین · حداکثر %3$d بازیکن · دسته %4$d کارتی</string>
+    <string name="settings_variant_noboard_desc">%1$d کارت برای هر بازیکن · بدون کارت زمین · حداکثر %2$d بازیکن · دسته %3$d کارتی</string>
+    <string name="settings_variant_engines_planned">ارزیابی دست ابتدا برای تگزاس هولدم (فاز ۵) و سپس برای اوماها، اوماها های-لو، استاد، دراو و شورت دک (فاز ۹) اضافه می‌شود. این انتخاب هم‌اکنون برای قواعد اعتبارسنجی وضعیت بازی استفاده می‌شود.</string>
+
+    <string name="settings_detection_title">مدل و تشخیص</string>
+    <string name="settings_model_title">مدل تشخیص</string>
+    <string name="settings_model_none">مدلی نصب نشده است</string>
+    <string name="settings_model_none_desc">مدل آموزش‌دیدهٔ تشخیص کارت هنوز همراه برنامه نیست. تا نصب مدل، برنامه هیچ تشخیصی نمایش نمی‌دهد. هیچ نتیجهٔ ساختگی نمایش داده نمی‌شود.</string>
+    <string name="settings_fps">نرخ تحلیل: %1$d فریم در ثانیه</string>
+    <string name="settings_fps_help">تعداد فریم‌هایی از دوربین که در هر ثانیه تحلیل می‌شوند. مقدار بیشتر واکنش سریع‌تر ولی مصرف باتری بیشتری دارد.</string>
+    <string name="settings_min_confidence">حداقل اطمینان تشخیص</string>
+    <string name="settings_min_confidence_help">تشخیص‌های کمتر از این مقدار به‌عنوان نویز نادیده گرفته می‌شوند.</string>
+    <string name="settings_auto_confirm">اطمینان تأیید خودکار</string>
+    <string name="settings_auto_confirm_help">تشخیص‌های برابر یا بیشتر از این مقدار بدون بازبینی شما قابل تأییدند. هر چیزی بین این دو مقدار نامطمئن نمایش داده می‌شود و باید تأیید یا اصلاح شود.</string>
+    <string name="settings_reset_defaults">بازگشت به پیش‌فرض</string>
+
+    <string name="settings_privacy_title">حریم خصوصی و فضای ذخیره‌سازی</string>
+    <string name="settings_privacy_fact_local">تصاویر و ویدیوها روی همین دستگاه پردازش می‌شوند.</string>
+    <string name="settings_privacy_fact_network">برنامه دسترسی به اینترنت درخواست نمی‌کند؛ چیزی بارگذاری نمی‌شود.</string>
+    <string name="settings_privacy_fact_private_storage">رسانه‌های واردشده و ضبط‌شده در حافظهٔ خصوصی برنامه کپی می‌شوند و برای برنامه‌های دیگر قابل مشاهده نیستند.</string>
+    <string name="settings_privacy_fact_audio">ویدیو بدون صدا ضبط می‌شود؛ میکروفون هرگز استفاده نمی‌شود.</string>
+    <string name="settings_storage_used">فضای مصرف‌شده توسط رسانه‌ها: %1$s</string>
+    <string name="settings_delete_all">حذف همهٔ داده‌ها</string>
+    <string name="settings_delete_all_confirm_title">همهٔ داده‌های برنامه حذف شود؟</string>
+    <string name="settings_delete_all_confirm_body">همهٔ تصاویر، ویدیوها، بازی‌ها و تاریخچهٔ دست‌ها برای همیشه حذف و تنظیمات بازنشانی می‌شوند. فایل‌های اصلی در گالری شما تغییری نمی‌کنند.</string>
+    <string name="settings_cleared">همهٔ داده‌های محلی حذف شد.</string>
+    <string name="settings_export_planned">خروجی گرفتن از تاریخچهٔ بازی (تاریخچهٔ دست‌ها و گزارش‌ها) همراه با بخش آمار برنامه‌ریزی شده است.</string>
+</resources>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="image_title">Image Analysis</string>
+    <string name="image_detail_title">Image</string>
+    <string name="image_import">Import image</string>
+    <string name="image_empty">No images yet. Import a photo of a table or capture one with the live camera.</string>
+    <string name="image_delete">Delete</string>
+    <string name="image_cancel">Cancel</string>
+    <string name="image_delete_confirm_title">Delete this image?</string>
+    <string name="image_delete_confirm_body">The copy stored in this app will be permanently removed. The original in your gallery is not affected.</string>
+    <string name="image_meta_name">File name</string>
+    <string name="image_meta_resolution">Resolution</string>
+    <string name="image_meta_size">Size</string>
+    <string name="image_meta_added">Added</string>
+    <string name="image_detection_planned">Card and chip detection on images will be added with the detection model. No results are shown until a trained model is available.</string>
+</resources>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="video_title">Video Analysis</string>
+    <string name="video_detail_title">Video</string>
+    <string name="video_import">Import video</string>
+    <string name="video_importing">Copying video into app storage…</string>
+    <string name="video_empty">No videos yet. Import a recorded game or record one with the live camera.</string>
+    <string name="video_delete">Delete</string>
+    <string name="video_cancel">Cancel</string>
+    <string name="video_delete_confirm_title">Delete this video?</string>
+    <string name="video_delete_confirm_body">The copy stored in this app will be permanently removed. The original in your gallery is not affected.</string>
+    <string name="video_analysis_planned">Frame extraction, keyframe selection, card detection over time and timeline review are planned. Playback only for now.</string>
+</resources>

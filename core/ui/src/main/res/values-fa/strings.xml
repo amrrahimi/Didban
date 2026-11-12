@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="ui_back">بازگشت</string>
+    <string name="ui_confidence_high">بالا</string>
+    <string name="ui_confidence_medium">متوسط</string>
+    <string name="ui_confidence_low">پایین</string>
+    <string name="ui_confidence_description">اطمینان %1$s، %2$d درصد</string>
+    <string name="ui_planned_title">برنامه‌ریزی‌شده برای فاز %1$d توسعه</string>
+    <string name="ui_delete">حذف</string>
+    <string name="ui_cancel">انصراف</string>
+
+    <string name="variant_texas_holdem">تگزاس هولدم</string>
+    <string name="variant_omaha">اوماها</string>
+    <string name="variant_omaha_hi_lo">اوماها های-لو</string>
+    <string name="variant_seven_card_stud">سون کارت استاد</string>
+    <string name="variant_five_card_draw">فایو کارت دراو</string>
+    <string name="variant_short_deck">شورت دک (۶+)</string>
+
+    <string name="error_io">خواندن یا نوشتن فایل ممکن نشد. فضای ذخیره‌سازی را بررسی و دوباره تلاش کنید.</string>
+    <string name="error_not_found">این مورد دیگر وجود ندارد.</string>
+    <string name="error_validation">این نوع فایل پشتیبانی نمی‌شود.</string>
+    <string name="error_permission">برای این کار به مجوز نیاز است.</string>
+    <string name="error_unsupported">این دستگاه از قابلیت درخواستی پشتیبانی نمی‌کند.</string>
+    <string name="error_unknown">مشکلی پیش آمد. لطفاً دوباره تلاش کنید.</string>
+</resources>

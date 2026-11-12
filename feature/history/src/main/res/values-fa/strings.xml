@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="history_title">تاریخچه بازی</string>
+    <string name="history_tab_media">رسانه‌ها</string>
+    <string name="history_tab_games">بازی‌ها</string>
+    <string name="history_media_empty">عکس یا ویدیوی ذخیره‌شده‌ای وجود ندارد.</string>
+    <string name="history_games_empty">هنوز بازی‌ای ثبت نشده است. جلسه‌های بازی پس از فعال شدن بازسازی وضعیت بازی (فاز ۴) ایجاد می‌شوند.</string>
+    <string name="history_game_summary">%1$s · %2$d بازیکن</string>
+    <string name="history_delete">حذف</string>
+</resources>

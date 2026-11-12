@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="history_title">Game History</string>
+    <string name="history_tab_media">Media</string>
+    <string name="history_tab_games">Games</string>
+    <string name="history_media_empty">No saved photos or videos.</string>
+    <string name="history_games_empty">No games recorded yet. Game sessions are created once game-state reconstruction is available (phase 4).</string>
+    <string name="history_game_summary">%1$s · %2$d players</string>
+    <string name="history_delete">Delete</string>
+</resources>

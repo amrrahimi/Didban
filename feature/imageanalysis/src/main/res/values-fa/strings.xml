@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="image_title">تحلیل تصویر</string>
+    <string name="image_detail_title">تصویر</string>
+    <string name="image_import">وارد کردن تصویر</string>
+    <string name="image_empty">هنوز تصویری نیست. عکسی از میز وارد کنید یا با دوربین زنده بگیرید.</string>
+    <string name="image_delete">حذف</string>
+    <string name="image_cancel">انصراف</string>
+    <string name="image_delete_confirm_title">این تصویر حذف شود؟</string>
+    <string name="image_delete_confirm_body">نسخهٔ ذخیره‌شده در این برنامه برای همیشه پاک می‌شود. فایل اصلی در گالری شما تغییری نمی‌کند.</string>
+    <string name="image_meta_name">نام فایل</string>
+    <string name="image_meta_resolution">وضوح</string>
+    <string name="image_meta_size">حجم</string>
+    <string name="image_meta_added">تاریخ افزودن</string>
+    <string name="image_detection_planned">تشخیص کارت و ژتون در تصاویر همراه با مدل تشخیص اضافه می‌شود. تا زمانی که مدل آموزش‌دیده در دسترس نباشد، نتیجه‌ای نمایش داده نمی‌شود.</string>
+</resources>

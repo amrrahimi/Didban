@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="home_title">پوکر ویژن AI</string>
+    <string name="home_default_variant">بازی پیش‌فرض: %1$s</string>
+    <string name="home_stat_images">تصویر</string>
+    <string name="home_stat_videos">ویدیو</string>
+    <string name="home_stat_games">بازی</string>
+    <string name="home_stat_hands">دست</string>
+    <string name="home_badge_phase">فاز %1$d</string>
+
+    <string name="home_tile_camera">دوربین زنده</string>
+    <string name="home_tile_camera_sub">پیش‌نمایش، عکس‌برداری و ضبط ویدیو</string>
+    <string name="home_tile_image">تحلیل تصویر</string>
+    <string name="home_tile_image_sub">وارد کردن و بررسی عکس‌های میز</string>
+    <string name="home_tile_video">تحلیل ویدیو</string>
+    <string name="home_tile_video_sub">وارد کردن و پخش بازی‌های ضبط‌شده</string>
+    <string name="home_tile_calculator">ماشین‌حساب پوکر</string>
+    <string name="home_tile_calculator_sub">اکوئیتی، شانس و اوت‌ها</string>
+    <string name="home_tile_history">تاریخچه بازی</string>
+    <string name="home_tile_history_sub">رسانه‌ها و بازی‌های ذخیره‌شده</string>
+    <string name="home_tile_stats">آمار</string>
+    <string name="home_tile_stats_sub">گزارش‌های عملکرد</string>
+    <string name="home_tile_variant">نوع بازی</string>
+    <string name="home_tile_variant_sub">انتخاب نوع پیش‌فرض پوکر</string>
+    <string name="home_tile_detection">مدل و تشخیص</string>
+    <string name="home_tile_detection_sub">نرخ فریم و آستانه‌های اطمینان</string>
+    <string name="home_tile_privacy">حریم خصوصی و فضای ذخیره‌سازی</string>
+    <string name="home_tile_privacy_sub">داده‌های محلی، مصرف فضا و حذف</string>
+
+    <string name="home_disclaimer">فقط برای آموزش، تمرین و بازبینی پس از بازی. برای کمک هم‌زمان در بازی‌های آنلاین یا حضوری که در آن‌ها ممنوع است استفاده نکنید.</string>
+</resources>

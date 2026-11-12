@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Poker Vision AI</string>
+    <string name="language_menu">Language</string>
+    <string name="language_system">System default</string>
+    <string name="language_english">English</string>
+    <string name="language_persian">فارسی (Persian)</string>
+
+    <string name="calculator_title">Poker Calculator</string>
+    <string name="calculator_intro">Enter hole cards and board to see hand rank, equity, pot odds, outs and EV.</string>
+    <string name="calculator_planned">Requires the hand evaluator (phase 5) and equity engine (phase 6). Exact enumeration will be used where practical; Monte Carlo estimates will be labelled with their confidence interval.</string>
+    <string name="statistics_title">Statistics</string>
+    <string name="statistics_intro">Reports across your saved games and hands.</string>
+    <string name="statistics_planned">Statistics need recorded hand histories, which are produced once game-state reconstruction and video review are in place.</string>
+</resources>
