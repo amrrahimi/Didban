@@ -4,7 +4,7 @@ Source: Hugging Face dataset Mariofm02/cards_images (one card per image). Files 
 core/vision/src/androidTest/assets/samples/<CODE>_<n>.jpg, e.g. AS_0.jpg. Failures are not fatal:
 the instrumented test is skipped when no samples exist.
 """
-import json, os, random, sys, urllib.request
+import json, os, random, sys, time, urllib.request
 
 DATASET = "Mariofm02/cards_images"
 DEST = os.path.join(os.path.dirname(__file__), "..", "core", "vision", "src", "androidTest", "assets", "samples")
@@ -12,9 +12,16 @@ RANKS = {"ace": "A", "two": "2", "three": "3", "four": "4", "five": "5", "six": 
          "nine": "9", "ten": "10", "jack": "J", "queen": "Q", "king": "K"}
 SUITS = {"clubs": "C", "diamonds": "D", "hearts": "H", "spades": "S"}
 
-def get(url):
-    with urllib.request.urlopen(url, timeout=30) as r:
-        return r.read()
+def get(url, attempts=4):
+    last = None
+    for i in range(attempts):
+        try:
+            with urllib.request.urlopen(url, timeout=60) as r:
+                return r.read()
+        except Exception as e:  # transient network errors: retry with backoff
+            last = e
+            time.sleep(2 * (i + 1))
+    raise last
 
 def code_for(name):
     parts = name.lower().split(" of ")
@@ -33,11 +40,15 @@ def main():
     for offset in random.sample(range(total), 40):
         if saved >= 16:
             break
-        row = json.loads(get(base + f"&offset={offset}&length=1"))["rows"][0]["row"]
-        code = code_for(names[row["label"]])
-        if code is None:
+        try:
+            row = json.loads(get(base + f"&offset={offset}&length=1"))["rows"][0]["row"]
+            code = code_for(names[row["label"]])
+            if code is None:
+                continue
+            data = get(row["image"]["src"])
+        except Exception as e:
+            print("skip", offset, e)
             continue
-        data = get(row["image"]["src"])
         with open(os.path.join(DEST, f"{code}_{saved}.jpg"), "wb") as f:
             f.write(data)
         saved += 1
