@@ -67,12 +67,16 @@ jobs:
         run: |
           TAG=poker-vision-latest
           cp app/build/outputs/apk/debug/app-debug.apk PokerVisionAI.apk
-          gh release delete "$TAG" --yes --cleanup-tag || true
-          gh release create "$TAG" PokerVisionAI.apk \
-            --target "${GITHUB_SHA}" \
-            --prerelease \
-            --title "Poker Vision AI - test build #${GITHUB_RUN_NUMBER}" \
-            --notes "Latest automatic test build of the poker-vision branch (commit ${GITHUB_SHA::7}). Download PokerVisionAI.apk on your Android phone (Android 8.0+) and open it to install."
+          NOTES="Latest automatic test build #${GITHUB_RUN_NUMBER} of the poker-vision branch (commit ${GITHUB_SHA::7}). Download PokerVisionAI.apk on your Android phone (Android 8.0+), about 101 MB, and open it to install."
+          # Replace the file in place: the release (and the download link) never disappears, so a
+          # download started during publishing can no longer get a missing or partial file.
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release upload "$TAG" PokerVisionAI.apk --clobber
+            gh release edit "$TAG" --title "Poker Vision AI - test build #${GITHUB_RUN_NUMBER}" --notes "$NOTES" --prerelease
+          else
+            gh release create "$TAG" PokerVisionAI.apk --target "${GITHUB_SHA}" --prerelease \
+              --title "Poker Vision AI - test build #${GITHUB_RUN_NUMBER}" --notes "$NOTES"
+          fi
 
       - name: Upload test reports
         if: always()
