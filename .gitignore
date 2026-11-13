@@ -19,3 +19,4 @@
 
 # Card detection model is downloaded by scripts/fetch_card_model.sh (AGPL-3.0 weights)
 core/vision/src/main/assets/models/
+core/vision/src/androidTest/assets/samples/
