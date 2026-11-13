@@ -2,7 +2,6 @@ package com.pokervision.core.domain.usecase
 
 import com.pokervision.core.common.result.AppError
 import com.pokervision.core.common.result.AppResult
-import com.pokervision.core.domain.media.KeyframeStore
 import com.pokervision.core.domain.repository.GameRepository
 import com.pokervision.core.domain.repository.MediaRepository
 import com.pokervision.core.domain.repository.SettingsRepository
@@ -56,10 +55,8 @@ class ClearAllLocalDataUseCase @Inject constructor(
     private val mediaRepository: MediaRepository,
     private val gameRepository: GameRepository,
     private val settingsRepository: SettingsRepository,
-    private val keyframeStore: KeyframeStore,
 ) {
     suspend operator fun invoke(): AppResult<Unit> {
-        keyframeStore.clearAll()
         val media = mediaRepository.deleteAll()
         val games = gameRepository.deleteAll()
         val settings = try {

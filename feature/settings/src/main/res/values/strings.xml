@@ -18,21 +18,12 @@
     <string name="settings_auto_confirm">Auto-confirm confidence</string>
     <string name="settings_auto_confirm_help">Detections at or above this can be confirmed without your review. Anything between the two values is shown as uncertain and must be confirmed or corrected.</string>
     <string name="settings_reset_defaults">Reset to defaults</string>
-    <string name="settings_video_section">Video analysis</string>
-    <string name="settings_video_interval">Sample every</string>
-    <string name="settings_video_interval_help">How often a frame is checked when extracting keyframes. Shorter catches quick actions but takes longer.</string>
-    <string name="settings_seconds">%1$s s</string>
-    <string name="settings_keyframe_sensitivity">Keyframe sensitivity</string>
-    <string name="settings_keyframe_sensitivity_help">How much the table must change before a new keyframe is kept. High also catches a single card being turned.</string>
-    <string name="settings_sensitivity_low">Low</string>
-    <string name="settings_sensitivity_medium">Medium</string>
-    <string name="settings_sensitivity_high">High</string>
 
     <string name="settings_privacy_title">Privacy &amp; Storage</string>
     <string name="settings_privacy_fact_local">Images and video are processed on this device.</string>
     <string name="settings_privacy_fact_network">The app does not request internet access; nothing is uploaded.</string>
     <string name="settings_privacy_fact_private_storage">Imported and captured media is copied into private app storage, invisible to other apps.</string>
-    <string name="settings_privacy_fact_audio">Video is recorded without audio; the microphone is never used.</string>
+    <string name="settings_privacy_fact_audio">The microphone is never used.</string>
     <string name="settings_storage_used">Media storage used: %1$s</string>
     <string name="settings_delete_all">Delete all data</string>
     <string name="settings_delete_all_confirm_title">Delete all app data?</string>

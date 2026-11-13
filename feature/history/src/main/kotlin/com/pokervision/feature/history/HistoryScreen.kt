@@ -53,7 +53,6 @@ import java.io.File
 fun HistoryRoute(
     onBack: () -> Unit,
     onOpenImage: (Long) -> Unit,
-    onOpenVideo: (Long) -> Unit,
     viewModel: HistoryViewModel = hiltViewModel(),
 ) {
     val content by viewModel.content.collectAsStateWithLifecycle()
@@ -75,7 +74,8 @@ fun HistoryRoute(
                 c == null -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { CircularProgressIndicator() }
                 tab == 0 -> MediaList(
                     media = c.media,
-                    onOpen = { if (it.type == MediaType.IMAGE) onOpenImage(it.id) else onOpenVideo(it.id) },
+                    // Videos from app versions <= 0.2 can still be listed and deleted, not opened.
+                    onOpen = { if (it.type == MediaType.IMAGE) onOpenImage(it.id) },
                     onDelete = { viewModel.deleteMedia(it.id) },
                 )
                 else -> GameList(c, onDelete = viewModel::deleteGame)

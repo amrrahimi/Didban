@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="advisor_title">مشاور زنده</string>
+    <string name="advisor_new_hand">دست جدید</string>
+    <string name="advisor_variant_not_supported">بازی انتخاب‌شدهٔ شما %1$s است. مشاور فعلاً فقط تگزاس هولدم را محاسبه می‌کند؛ انواع دیگر در حال اضافه شدن هستند.</string>
+
+    <string name="advisor_need_hero">دو کارت دست خود را از پایین انتخاب کنید.</string>
+    <string name="advisor_need_board">زمین باید ۳ کارت (فلاپ)، ۴ کارت (ترن) یا ۵ کارت (ریور) داشته باشد.</string>
+    <string name="advisor_too_many_cards">برای این تعداد حریف، کارت‌های زیادی علامت خورده است.</string>
+
+    <string name="advisor_action_fold">فولد</string>
+    <string name="advisor_action_check">چک</string>
+    <string name="advisor_action_call">کال</string>
+    <string name="advisor_action_bet">بِت</string>
+    <string name="advisor_action_raise">رِیز</string>
+
+    <string name="advisor_reason_below_odds">شانس شما (%1$s) کمتر از چیزی است که پات لازم دارد (%2$s): کال کردن در درازمدت ضرر می‌دهد.</string>
+    <string name="advisor_reason_above_odds">شانس شما (%1$s) هزینهٔ کال را پوشش می‌دهد (%2$s لازم است).</string>
+    <string name="advisor_reason_strong">شانس شما (%1$s) به‌وضوح از بقیه جلوتر است (بِت از %2$s): پات را بزرگ کنید.</string>
+    <string name="advisor_reason_free">هزینه‌ای لازم نیست. شانس شما (%1$s) برای بِت کافی نیست (بِت از %2$s).</string>
+    <string name="advisor_reason_fair_share">مقدار پات وارد نشده: به‌جای شانس دقیق پات، با سهم مساوی از پات مقایسه شد.</string>
+
+    <string name="advisor_equity_exact">شانس بردن پات: %1$s (دقیق)</string>
+    <string name="advisor_equity_estimate">شانس بردن پات: %1$s (تخمین ±%2$s)</string>
+    <string name="advisor_win_tie">برد %1$s · تقسیم %2$s · در برابر %3$d حریف</string>
+    <string name="advisor_current_hand">دست فعلی شما: %1$s</string>
+    <string name="advisor_pot_odds">لازم برای کال: %1$s</string>
+    <string name="advisor_call_ev">میانگین نتیجهٔ کال: %1$s ژتون</string>
+    <string name="advisor_improving">%1$d کارت دیده‌نشده دست شما را در کارت بعدی بهتر می‌کند.</string>
+    <string name="advisor_compute_time">محاسبه در %1$d میلی‌ثانیه</string>
+
+    <string name="advisor_target_hero">کارت‌های من</string>
+    <string name="advisor_target_board">زمین</string>
+    <string name="advisor_target_seen">دیده‌شده</string>
+    <string name="advisor_seen_help">کارت‌هایی که می‌دانید از این دست بیرون هستند (مثلاً بازیکنی که فولد کرده نشان داده). این کارت‌ها دیگر روی زمین نمی‌آیند.</string>
+
+    <string name="advisor_opponents">حریف‌هایی که هنوز در دست هستند</string>
+    <string name="advisor_fewer_opponents">حریف کمتر</string>
+    <string name="advisor_more_opponents">حریف بیشتر</string>
+    <string name="advisor_pot">پات</string>
+    <string name="advisor_to_call">مبلغ کال</string>
+    <string name="advisor_money_help">اختیاری. پات = همهٔ ژتون‌های وسط میز، شامل شرط‌های همین دور. مبلغ کال = مقداری که برای ماندن باید اضافه کنید. اگر کسی شرط نبسته، «مبلغ کال» را خالی بگذارید.</string>
+
+    <string name="advisor_disclaimer">ابزار یادگیری: پیشنهاد فقط بر اساس احتمال و شانس پات است و فرض می‌کند حریف‌ها کارت تصادفی دارند. بازیکنان واقعی دست‌های ضعیف را فولد می‌کنند، پس وقتی کسی شرط بزرگی می‌بندد معمولاً دستش از حالت تصادفی قوی‌تر است. فقط در بازی‌هایی استفاده کنید که همه در جریان هستند.</string>
+
+    <string name="hand_high_card">کارت بالا</string>
+    <string name="hand_one_pair">یک جفت</string>
+    <string name="hand_two_pair">دو جفت</string>
+    <string name="hand_trips">سه‌تایی</string>
+    <string name="hand_straight">استریت</string>
+    <string name="hand_flush">فلاش</string>
+    <string name="hand_full_house">فول هاوس</string>
+    <string name="hand_quads">چهارتایی</string>
+    <string name="hand_straight_flush">استریت فلاش</string>
+</resources>

@@ -12,14 +12,13 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.BarChart
-import androidx.compose.material.icons.outlined.Calculate
 import androidx.compose.material.icons.outlined.History
 import androidx.compose.material.icons.outlined.Image
+import androidx.compose.material.icons.outlined.Lightbulb
 import androidx.compose.material.icons.outlined.PhotoCamera
 import androidx.compose.material.icons.outlined.PrivacyTip
 import androidx.compose.material.icons.outlined.Style
 import androidx.compose.material.icons.outlined.Tune
-import androidx.compose.material.icons.outlined.VideoLibrary
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.LinearProgressIndicator
@@ -42,7 +41,7 @@ import com.pokervision.core.ui.text.label
 
 /** Destinations reachable from the dashboard. The app module maps them to navigation routes. */
 enum class HomeEntry {
-    LIVE_CAMERA, IMAGE_ANALYSIS, VIDEO_ANALYSIS, CALCULATOR, HISTORY, STATISTICS,
+    ADVISOR, LIVE_CAMERA, IMAGE_ANALYSIS, HISTORY, STATISTICS,
     VARIANT_SELECTION, DETECTION_SETTINGS, PRIVACY_SETTINGS,
 }
 
@@ -56,10 +55,9 @@ private data class TileSpec(
 )
 
 private val TILES = listOf(
+    TileSpec(HomeEntry.ADVISOR, R.string.home_tile_advisor, R.string.home_tile_advisor_sub, Icons.Outlined.Lightbulb),
     TileSpec(HomeEntry.LIVE_CAMERA, R.string.home_tile_camera, R.string.home_tile_camera_sub, Icons.Outlined.PhotoCamera),
     TileSpec(HomeEntry.IMAGE_ANALYSIS, R.string.home_tile_image, R.string.home_tile_image_sub, Icons.Outlined.Image),
-    TileSpec(HomeEntry.VIDEO_ANALYSIS, R.string.home_tile_video, R.string.home_tile_video_sub, Icons.Outlined.VideoLibrary),
-    TileSpec(HomeEntry.CALCULATOR, R.string.home_tile_calculator, R.string.home_tile_calculator_sub, Icons.Outlined.Calculate, plannedPhase = 6),
     TileSpec(HomeEntry.HISTORY, R.string.home_tile_history, R.string.home_tile_history_sub, Icons.Outlined.History),
     TileSpec(HomeEntry.STATISTICS, R.string.home_tile_stats, R.string.home_tile_stats_sub, Icons.Outlined.BarChart, plannedPhase = 8),
     TileSpec(HomeEntry.VARIANT_SELECTION, R.string.home_tile_variant, R.string.home_tile_variant_sub, Icons.Outlined.Style),
@@ -132,7 +130,6 @@ private fun SummaryCard(summary: DashboardSummary) {
             )
             Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
                 Stat(stringResource(R.string.home_stat_images), summary.imageCount)
-                Stat(stringResource(R.string.home_stat_videos), summary.videoCount)
                 Stat(stringResource(R.string.home_stat_games), summary.gameCount)
                 Stat(stringResource(R.string.home_stat_hands), summary.handCount)
             }

@@ -105,11 +105,16 @@ class MediaFileStore @Inject constructor(
 
     fun delete(path: String): Boolean = isManaged(path) && File(path).let { !it.exists() || it.delete() }
 
-    fun deleteAll(): Boolean = !root.exists() || root.deleteRecursively()
+    fun deleteAll(): Boolean {
+        // Keyframe images cached by app version 0.2 (video analysis was removed in 0.3).
+        File(context.cacheDir, LEGACY_KEYFRAME_CACHE).deleteRecursively()
+        return !root.exists() || root.deleteRecursively()
+    }
 
     fun usageBytes(): Long = root.walkBottomUp().filter { it.isFile }.sumOf { it.length() }
 
     private companion object {
         const val ROOT_DIR = "media"
+        const val LEGACY_KEYFRAME_CACHE = "keyframes"
     }
 }

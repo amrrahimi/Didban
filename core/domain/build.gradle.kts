@@ -17,6 +17,7 @@ kotlin {
 dependencies {
     api(project(":core:model"))
     api(project(":core:common"))
+    api(project(":core:poker"))
     api(libs.kotlinx.coroutines.core)
     implementation(libs.javax.inject)
     // Generates @Inject factories for use cases here, so Hilt doesn't have to synthesize them downstream.

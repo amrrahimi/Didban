@@ -6,9 +6,6 @@
     <string name="language_english">English (انگلیسی)</string>
     <string name="language_persian">فارسی</string>
 
-    <string name="calculator_title">ماشین‌حساب پوکر</string>
-    <string name="calculator_intro">کارت‌های دست و زمین را وارد کنید تا رتبهٔ دست، اکوئیتی، شانس پات، اوت‌ها و EV را ببینید.</string>
-    <string name="calculator_planned">به ارزیاب دست (فاز ۵) و موتور اکوئیتی (فاز ۶) نیاز دارد. در صورت امکان شمارش دقیق انجام می‌شود و تخمین‌های مونت‌کارلو همراه با بازهٔ اطمینان برچسب‌گذاری می‌شوند.</string>
     <string name="statistics_title">آمار</string>
     <string name="statistics_intro">گزارش‌هایی از بازی‌ها و دست‌های ذخیره‌شدهٔ شما.</string>
     <string name="statistics_planned">آمار به تاریخچهٔ دست‌های ثبت‌شده نیاز دارد که پس از فعال شدن بازسازی وضعیت بازی و بازبینی ویدیو تولید می‌شود.</string>

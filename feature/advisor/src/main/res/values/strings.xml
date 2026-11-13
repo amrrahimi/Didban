@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="advisor_title">Live Advisor</string>
+    <string name="advisor_new_hand">New hand</string>
+    <string name="advisor_variant_not_supported">Your selected game is %1$s. The advisor currently calculates Texas Hold\'em only; the other variants are being added.</string>
+
+    <string name="advisor_need_hero">Tap your two cards below.</string>
+    <string name="advisor_need_board">The board needs 3 cards (flop), 4 (turn) or 5 (river).</string>
+    <string name="advisor_too_many_cards">Too many cards are marked for this many opponents.</string>
+
+    <string name="advisor_action_fold">FOLD</string>
+    <string name="advisor_action_check">CHECK</string>
+    <string name="advisor_action_call">CALL</string>
+    <string name="advisor_action_bet">BET</string>
+    <string name="advisor_action_raise">RAISE</string>
+
+    <string name="advisor_reason_below_odds">Your chance (%1$s) is below what the pot requires (%2$s): calling loses money in the long run.</string>
+    <string name="advisor_reason_above_odds">Your chance (%1$s) covers the price of calling (%2$s needed).</string>
+    <string name="advisor_reason_strong">Your chance (%1$s) is well ahead of the table (bet from %2$s): build the pot.</string>
+    <string name="advisor_reason_free">Nothing to pay. Your chance (%1$s) is not strong enough to bet (bet from %2$s).</string>
+    <string name="advisor_reason_fair_share">Pot size not entered: compared with an equal share of the pot instead of exact pot odds.</string>
+
+    <string name="advisor_equity_exact">Chance to win the pot: %1$s (exact)</string>
+    <string name="advisor_equity_estimate">Chance to win the pot: %1$s (estimate ±%2$s)</string>
+    <string name="advisor_win_tie">Win %1$s · split %2$s · against %3$d opponents</string>
+    <string name="advisor_current_hand">Your hand now: %1$s</string>
+    <string name="advisor_pot_odds">Needed to call: %1$s</string>
+    <string name="advisor_call_ev">Average result of calling: %1$s chips</string>
+    <string name="advisor_improving">%1$d unseen cards would improve your hand on the next card.</string>
+    <string name="advisor_compute_time">Calculated in %1$d ms</string>
+
+    <string name="advisor_target_hero">My cards</string>
+    <string name="advisor_target_board">Board</string>
+    <string name="advisor_target_seen">Seen</string>
+    <string name="advisor_seen_help">Cards you know are out of this hand (for example shown by a player who folded). They can no longer come on the board.</string>
+
+    <string name="advisor_opponents">Opponents still in the hand</string>
+    <string name="advisor_fewer_opponents">Fewer opponents</string>
+    <string name="advisor_more_opponents">More opponents</string>
+    <string name="advisor_pot">Pot</string>
+    <string name="advisor_to_call">To call</string>
+    <string name="advisor_money_help">Optional. Pot = all chips in the middle, including bets this round. To call = what you must add to stay in. Leave \"to call\" empty when nobody has bet.</string>
+
+    <string name="advisor_disclaimer">Learning aid: the advice uses only probability and pot odds and assumes opponents hold random cards. Real players fold weak hands, so when someone bets big their hand is usually stronger than random. Use it only in games where everyone knows.</string>
+
+    <string name="hand_high_card">High card</string>
+    <string name="hand_one_pair">One pair</string>
+    <string name="hand_two_pair">Two pair</string>
+    <string name="hand_trips">Three of a kind</string>
+    <string name="hand_straight">Straight</string>
+    <string name="hand_flush">Flush</string>
+    <string name="hand_full_house">Full house</string>
+    <string name="hand_quads">Four of a kind</string>
+    <string name="hand_straight_flush">Straight flush</string>
+</resources>

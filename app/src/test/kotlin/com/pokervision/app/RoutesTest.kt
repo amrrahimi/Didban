@@ -16,7 +16,6 @@ class RoutesTest {
     @Test
     fun `detail routes embed the id`() {
         assertEquals("images/42", Routes.imageDetail(42))
-        assertEquals("videos/7", Routes.videoDetail(7))
         assertEquals("images/{mediaId}", Routes.IMAGE_DETAIL)
     }
 }

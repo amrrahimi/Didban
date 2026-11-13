@@ -4,7 +4,6 @@ import com.pokervision.core.domain.repository.SettingsRepository
 import com.pokervision.core.model.confidence.ConfidenceThresholds
 import com.pokervision.core.model.game.PokerVariant
 import com.pokervision.core.model.settings.AppSettings
-import com.pokervision.core.model.settings.KeyframeSensitivity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -28,8 +27,6 @@ class SettingsViewModelTest {
         override suspend fun setConfidenceThresholds(minimumDetection: Float, autoConfirm: Float) {
             state.value = state.value.copy(confidenceThresholds = ConfidenceThresholds(minimumDetection, autoConfirm))
         }
-        override suspend fun setVideoSampleInterval(intervalMs: Long) { state.value = state.value.copy(videoSampleIntervalMs = intervalMs) }
-        override suspend fun setKeyframeSensitivity(sensitivity: KeyframeSensitivity) { state.value = state.value.copy(keyframeSensitivity = sensitivity) }
         override suspend fun resetToDefaults() { state.value = AppSettings() }
     }
 
@@ -54,12 +51,6 @@ class SettingsViewModelTest {
     }
 
     @Test
-    fun `unsupported video interval is ignored`() {
-        SettingsViewModel(repo).setVideoSampleInterval(333)
-        assertEquals(AppSettings.DEFAULT_VIDEO_SAMPLE_INTERVAL_MS, repo.state.value.videoSampleIntervalMs)
-    }
-
-    @Test
     fun `fps is clamped to the allowed range`() {
         SettingsViewModel(repo).setAnalysisFps(99)
         assertEquals(AppSettings.ANALYSIS_FPS_RANGE.last, repo.state.value.analysisFps)
@@ -69,11 +60,7 @@ class SettingsViewModelTest {
     fun `reset restores detection defaults`() {
         val vm = SettingsViewModel(repo)
         vm.setAnalysisFps(12)
-        vm.setVideoSampleInterval(200)
-        vm.setKeyframeSensitivity(KeyframeSensitivity.HIGH)
         vm.resetDetectionDefaults()
-        assertEquals(AppSettings().videoSampleIntervalMs, repo.state.value.videoSampleIntervalMs)
-        assertEquals(KeyframeSensitivity.MEDIUM, repo.state.value.keyframeSensitivity)
         assertEquals(AppSettings().analysisFps, repo.state.value.analysisFps)
         assertEquals(AppSettings().confidenceThresholds, repo.state.value.confidenceThresholds)
     }

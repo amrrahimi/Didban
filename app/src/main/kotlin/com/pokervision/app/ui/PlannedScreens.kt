@@ -32,15 +32,6 @@ private fun PlannedScreen(title: String, phase: Int, description: String, intro:
 }
 
 @Composable
-fun CalculatorPlaceholderScreen(onBack: () -> Unit) = PlannedScreen(
-    title = stringResource(R.string.calculator_title),
-    phase = 6,
-    intro = stringResource(R.string.calculator_intro),
-    description = stringResource(R.string.calculator_planned),
-    onBack = onBack,
-)
-
-@Composable
 fun StatisticsPlaceholderScreen(onBack: () -> Unit) = PlannedScreen(
     title = stringResource(R.string.statistics_title),
     phase = 8,

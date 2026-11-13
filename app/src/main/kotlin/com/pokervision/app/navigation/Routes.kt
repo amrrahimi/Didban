@@ -7,8 +7,7 @@ object Routes {
     const val HOME = "home"
     const val CAMERA = "camera"
     const val IMAGES = "images"
-    const val VIDEOS = "videos"
-    const val CALCULATOR = "calculator"
+    const val ADVISOR = "advisor"
     const val HISTORY = "history"
     const val STATISTICS = "statistics"
     const val VARIANT = "settings/variant"
@@ -17,16 +16,13 @@ object Routes {
 
     const val MEDIA_ID_ARG = "mediaId"
     const val IMAGE_DETAIL = "images/{$MEDIA_ID_ARG}"
-    const val VIDEO_DETAIL = "videos/{$MEDIA_ID_ARG}"
 
     fun imageDetail(id: Long) = "images/$id"
-    fun videoDetail(id: Long) = "videos/$id"
 
     fun forHomeEntry(entry: HomeEntry): String = when (entry) {
         HomeEntry.LIVE_CAMERA -> CAMERA
         HomeEntry.IMAGE_ANALYSIS -> IMAGES
-        HomeEntry.VIDEO_ANALYSIS -> VIDEOS
-        HomeEntry.CALCULATOR -> CALCULATOR
+        HomeEntry.ADVISOR -> ADVISOR
         HomeEntry.HISTORY -> HISTORY
         HomeEntry.STATISTICS -> STATISTICS
         HomeEntry.VARIANT_SELECTION -> VARIANT

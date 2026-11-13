@@ -8,8 +8,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.pokervision.app.locale.LanguageMenu
-import com.pokervision.app.ui.CalculatorPlaceholderScreen
 import com.pokervision.app.ui.StatisticsPlaceholderScreen
+import com.pokervision.feature.advisor.AdvisorRoute
 import com.pokervision.feature.camera.CameraRoute
 import com.pokervision.feature.history.HistoryRoute
 import com.pokervision.feature.home.HomeRoute
@@ -19,13 +19,10 @@ import com.pokervision.feature.imageanalysis.ImageListRoute
 import com.pokervision.feature.settings.DetectionSettingsRoute
 import com.pokervision.feature.settings.PrivacySettingsRoute
 import com.pokervision.feature.settings.VariantSelectionRoute
-import com.pokervision.feature.videoanalysis.VIDEO_ID_ARG
-import com.pokervision.feature.videoanalysis.VideoDetailRoute
-import com.pokervision.feature.videoanalysis.VideoListRoute
 
 @Composable
 fun PokerVisionNavHost(navController: NavHostController = rememberNavController()) {
-    check(IMAGE_ID_ARG == Routes.MEDIA_ID_ARG && VIDEO_ID_ARG == Routes.MEDIA_ID_ARG) { "Route argument mismatch" }
+    check(IMAGE_ID_ARG == Routes.MEDIA_ID_ARG) { "Route argument mismatch" }
     val back: () -> Unit = { navController.popBackStack() }
     val mediaIdArg = listOf(navArgument(Routes.MEDIA_ID_ARG) { type = NavType.LongType })
 
@@ -43,19 +40,13 @@ fun PokerVisionNavHost(navController: NavHostController = rememberNavController(
         }
         composable(Routes.IMAGE_DETAIL, arguments = mediaIdArg) { ImageDetailRoute(onBack = back) }
 
-        composable(Routes.VIDEOS) {
-            VideoListRoute(onBack = back, onOpenVideo = { navController.navigate(Routes.videoDetail(it)) })
-        }
-        composable(Routes.VIDEO_DETAIL, arguments = mediaIdArg) { VideoDetailRoute(onBack = back) }
-
         composable(Routes.HISTORY) {
             HistoryRoute(
                 onBack = back,
                 onOpenImage = { navController.navigate(Routes.imageDetail(it)) },
-                onOpenVideo = { navController.navigate(Routes.videoDetail(it)) },
             )
         }
-        composable(Routes.CALCULATOR) { CalculatorPlaceholderScreen(onBack = back) }
+        composable(Routes.ADVISOR) { AdvisorRoute(onBack = back) }
         composable(Routes.STATISTICS) { StatisticsPlaceholderScreen(onBack = back) }
         composable(Routes.VARIANT) { VariantSelectionRoute(onBack = back) }
         composable(Routes.DETECTION) { DetectionSettingsRoute(onBack = back) }

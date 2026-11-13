@@ -16,7 +16,7 @@ android {
         targetSdk = 35
         // CI build number, so each new APK installs as an update over the previous one.
         versionCode = System.getenv("GITHUB_RUN_NUMBER")?.toIntOrNull() ?: 1
-        versionName = "0.2.0-phase2"
+        versionName = "0.3.0-advisor"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         // Only ship the languages the app is translated into (keep in sync with res/xml/locales_config.xml).
         resourceConfigurations += listOf("en", "fa")
@@ -64,9 +64,9 @@ dependencies {
     implementation(project(":core:database"))
     implementation(project(":core:media"))
     implementation(project(":feature:home"))
+    implementation(project(":feature:advisor"))
     implementation(project(":feature:camera"))
     implementation(project(":feature:imageanalysis"))
-    implementation(project(":feature:videoanalysis"))
     implementation(project(":feature:history"))
     implementation(project(":feature:settings"))
 

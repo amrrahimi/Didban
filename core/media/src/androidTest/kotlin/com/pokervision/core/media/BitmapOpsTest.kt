@@ -13,7 +13,6 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.io.File
-import java.util.Locale
 
 @RunWith(AndroidJUnit4::class)
 class BitmapOpsTest {
@@ -58,23 +57,5 @@ class BitmapOpsTest {
         val decoded = BitmapOps.decodeOriented(file.absolutePath, 150)!!
         assertEquals(50, decoded.width)
         assertEquals(150, decoded.height)
-    }
-
-    @Test
-    fun keyframeStoreRoundTripsInPersianLocale() {
-        val previous = Locale.getDefault()
-        try {
-            Locale.setDefault(Locale.forLanguageTag("fa"))
-            val store = CacheKeyframeStore(context)
-            store.clear(99)
-            listOf(2_000L, 500L).forEach { ts ->
-                assertTrue(BitmapOps.saveJpeg(solid(10, 10, Color.GREEN), store.pathFor(99, ts), 80))
-            }
-            assertEquals(listOf(500L, 2_000L), store.list(99).map { it.timestampMs })
-            store.clear(99)
-            assertTrue(store.list(99).isEmpty())
-        } finally {
-            Locale.setDefault(previous)
-        }
     }
 }

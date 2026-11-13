@@ -28,6 +28,7 @@ include(":app")
 include(":core:common")
 include(":core:model")
 include(":core:domain")
+include(":core:poker")
 
 // Android library modules
 include(":core:database")
@@ -37,8 +38,8 @@ include(":core:media")
 
 // Feature modules
 include(":feature:home")
+include(":feature:advisor")
 include(":feature:camera")
 include(":feature:imageanalysis")
-include(":feature:videoanalysis")
 include(":feature:history")
 include(":feature:settings")

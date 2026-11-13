@@ -1,18 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="camera_title">دوربین زنده</string>
-    <string name="camera_permission_rationale">برای پیش‌نمایش میز و گرفتن عکس یا ویدیو به دسترسی دوربین نیاز است. فریم‌ها فقط روی همین دستگاه پردازش می‌شوند و چیزی بارگذاری نمی‌شود.</string>
+    <string name="camera_permission_rationale">برای پیش‌نمایش میز و عکس‌برداری به دسترسی دوربین نیاز است. فریم‌ها فقط روی همین دستگاه پردازش می‌شوند و چیزی بارگذاری نمی‌شود.</string>
     <string name="camera_permission_grant">اجازه دسترسی به دوربین</string>
     <string name="camera_permission_settings">باز کردن تنظیمات برنامه</string>
-    <string name="camera_mode_photo">عکس</string>
-    <string name="camera_mode_video">ویدیو</string>
     <string name="camera_take_photo">گرفتن عکس</string>
-    <string name="camera_start_recording">شروع ضبط</string>
-    <string name="camera_stop_recording">توقف ضبط</string>
     <string name="camera_switch_lens">تعویض دوربین</string>
-    <string name="camera_recording">در حال ضبط %1$s (بدون صدا)</string>
     <string name="camera_saved_photo">عکس در «تحلیل تصویر» ذخیره شد</string>
-    <string name="camera_saved_video">ویدیو در «تحلیل ویدیو» ذخیره شد</string>
     <string name="camera_error_bind">راه‌اندازی دوربین ممکن نشد. برنامه‌های دیگر دوربین را ببندید و دوباره تلاش کنید.</string>
     <string name="camera_error_capture">ثبت ناموفق بود. لطفاً دوباره تلاش کنید.</string>
     <string name="camera_diagnostics">تحلیل %1$s / %2$d فریم‌برثانیه · %3$d×%4$d · %5$d°</string>

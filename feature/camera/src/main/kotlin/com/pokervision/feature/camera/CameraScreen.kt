@@ -23,11 +23,8 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Cameraswitch
-import androidx.compose.material.icons.filled.FiberManualRecord
 import androidx.compose.material.icons.filled.PhotoCamera
-import androidx.compose.material.icons.filled.Stop
 import androidx.compose.material3.Button
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -35,9 +32,6 @@ import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SegmentedButton
-import androidx.compose.material3.SegmentedButtonDefaults
-import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -64,7 +58,6 @@ import com.pokervision.core.model.media.MediaType
 import com.pokervision.core.ui.component.ErrorBanner
 import com.pokervision.core.ui.component.PlannedFeatureNotice
 import com.pokervision.core.ui.component.PokerTopBar
-import com.pokervision.core.ui.text.formatDuration
 import com.pokervision.core.ui.text.userMessage
 import kotlinx.coroutines.launch
 import java.io.File
@@ -136,16 +129,13 @@ private fun CameraContent(viewModel: CameraViewModel) {
 
     DisposableEffect(session) { onDispose { session.release() } }
     LaunchedEffect(settings.analysisFps) { session.setAnalysisFps(settings.analysisFps) }
-    LaunchedEffect(previewView, state.mode, state.lens) {
-        previewView?.let { pv -> session.bind(lifecycleOwner, pv, state.mode, state.lens) { viewModel.onBindFailed() } }
+    LaunchedEffect(previewView, state.lens) {
+        previewView?.let { pv -> session.bind(lifecycleOwner, pv, state.lens) { viewModel.onBindFailed() } }
     }
 
     val savedPhoto = stringResource(R.string.camera_saved_photo)
-    val savedVideo = stringResource(R.string.camera_saved_video)
     LaunchedEffect(state.savedMessageCount) {
-        if (state.savedMessageCount > 0) {
-            snackbar.showSnackbar(if (state.lastSaved == MediaType.VIDEO) savedVideo else savedPhoto)
-        }
+        if (state.savedMessageCount > 0) snackbar.showSnackbar(savedPhoto)
     }
 
     Box(Modifier.fillMaxSize()) {
@@ -182,47 +172,21 @@ private fun CameraContent(viewModel: CameraViewModel) {
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             SnackbarHost(snackbar)
-            if (state.isRecording) {
-                Text(
-                    stringResource(R.string.camera_recording, formatDuration(state.recordedMillis)),
-                    color = MaterialTheme.colorScheme.error,
-                    style = MaterialTheme.typography.titleMedium,
-                )
-                Spacer(Modifier.height(8.dp))
-            }
-            ModeSelector(state.mode, enabled = !state.isRecording && !state.isCapturing, onSelect = viewModel::setMode)
-            Spacer(Modifier.height(12.dp))
             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(32.dp)) {
-                IconButton(onClick = viewModel::toggleLens, enabled = !state.isRecording && !state.isCapturing) {
+                IconButton(onClick = viewModel::toggleLens, enabled = !state.isCapturing) {
                     Icon(Icons.Filled.Cameraswitch, contentDescription = stringResource(R.string.camera_switch_lens), tint = Color.White)
                 }
                 ShutterButton(
-                    mode = state.mode,
-                    isRecording = state.isRecording,
                     enabled = !state.isCapturing,
                     onClick = {
-                        when {
-                            state.mode == CaptureMode.PHOTO -> scope.launch {
-                                val path = viewModel.prepareCaptureFile(MediaType.IMAGE) ?: return@launch
-                                viewModel.onCaptureStarted()
-                                session.takePhoto(
-                                    File(path),
-                                    onSaved = { viewModel.onMediaWritten(path, MediaType.IMAGE) },
-                                    onError = { viewModel.onCaptureFailed() },
-                                )
-                            }
-                            state.isRecording -> session.stopRecording()
-                            else -> scope.launch {
-                                val path = viewModel.prepareCaptureFile(MediaType.VIDEO) ?: return@launch
-                                viewModel.onRecordingStarted()
-                                session.startRecording(
-                                    File(path),
-                                    onProgress = viewModel::onRecordingProgress,
-                                    onFinished = { error ->
-                                        if (error == null) viewModel.onMediaWritten(path, MediaType.VIDEO) else viewModel.onCaptureFailed()
-                                    },
-                                )
-                            }
+                        scope.launch {
+                            val path = viewModel.prepareCaptureFile(MediaType.IMAGE) ?: return@launch
+                            viewModel.onCaptureStarted()
+                            session.takePhoto(
+                                File(path),
+                                onSaved = { viewModel.onMediaWritten(path, MediaType.IMAGE) },
+                                onError = { viewModel.onCaptureFailed() },
+                            )
                         }
                     },
                 )
@@ -249,38 +213,15 @@ private fun DiagnosticsOverlay(stats: FrameStats, targetFps: Int) {
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun ModeSelector(mode: CaptureMode, enabled: Boolean, onSelect: (CaptureMode) -> Unit) {
-    val modes = listOf(CaptureMode.PHOTO to R.string.camera_mode_photo, CaptureMode.VIDEO to R.string.camera_mode_video)
-    SingleChoiceSegmentedButtonRow {
-        modes.forEachIndexed { index, (m, label) ->
-            SegmentedButton(
-                selected = mode == m,
-                onClick = { onSelect(m) },
-                enabled = enabled,
-                shape = SegmentedButtonDefaults.itemShape(index, modes.size),
-            ) { Text(stringResource(label)) }
-        }
-    }
-}
-
-@Composable
-private fun ShutterButton(mode: CaptureMode, isRecording: Boolean, enabled: Boolean, onClick: () -> Unit) {
-    val (icon, desc) = when {
-        mode == CaptureMode.PHOTO -> Icons.Filled.PhotoCamera to R.string.camera_take_photo
-        isRecording -> Icons.Filled.Stop to R.string.camera_stop_recording
-        else -> Icons.Filled.FiberManualRecord to R.string.camera_start_recording
-    }
+private fun ShutterButton(enabled: Boolean, onClick: () -> Unit) {
     FilledIconButton(
         onClick = onClick,
         enabled = enabled,
         modifier = Modifier.size(72.dp),
         shape = CircleShape,
-        colors = IconButtonDefaults.filledIconButtonColors(
-            containerColor = if (isRecording) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary,
-        ),
+        colors = IconButtonDefaults.filledIconButtonColors(containerColor = MaterialTheme.colorScheme.primary),
     ) {
-        Icon(icon, contentDescription = stringResource(desc), modifier = Modifier.size(36.dp))
+        Icon(Icons.Filled.PhotoCamera, contentDescription = stringResource(R.string.camera_take_photo), modifier = Modifier.size(36.dp))
     }
 }

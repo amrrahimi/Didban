@@ -20,13 +20,9 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 data class CameraUiState(
-    val mode: CaptureMode = CaptureMode.PHOTO,
     val lens: LensFacing = LensFacing.BACK,
     val isCapturing: Boolean = false,
-    val isRecording: Boolean = false,
-    val recordedMillis: Long = 0,
     val savedMessageCount: Int = 0,
-    val lastSaved: MediaType? = null,
     val error: CameraError? = null,
 )
 
@@ -49,13 +45,8 @@ class CameraViewModel @Inject constructor(
     val settings: StateFlow<AppSettings> =
         settingsRepository.settings.stateIn(viewModelScope, SharingStarted.Eagerly, AppSettings())
 
-    fun setMode(mode: CaptureMode) {
-        if (_state.value.isRecording) return
-        _state.update { it.copy(mode = mode) }
-    }
-
     fun toggleLens() {
-        if (_state.value.isRecording) return
+        if (_state.value.isCapturing) return
         _state.update { it.copy(lens = if (it.lens == LensFacing.BACK) LensFacing.FRONT else LensFacing.BACK) }
     }
 
@@ -71,30 +62,21 @@ class CameraViewModel @Inject constructor(
 
     fun onCaptureStarted() = _state.update { it.copy(isCapturing = true, error = null) }
 
-    fun onRecordingStarted() = _state.update { it.copy(isRecording = true, recordedMillis = 0, error = null) }
-
-    fun onRecordingProgress(millis: Long) = _state.update { it.copy(recordedMillis = millis) }
-
     fun onMediaWritten(path: String, type: MediaType) {
         viewModelScope.launch {
             when (val r = registerCapturedMedia(path, type)) {
                 is AppResult.Success -> _state.update {
-                    it.copy(
-                        isCapturing = false,
-                        isRecording = false,
-                        lastSaved = type,
-                        savedMessageCount = it.savedMessageCount + 1,
-                    )
+                    it.copy(isCapturing = false, savedMessageCount = it.savedMessageCount + 1)
                 }
                 is AppResult.Failure -> _state.update {
-                    it.copy(isCapturing = false, isRecording = false, error = CameraError.Storage(r.error))
+                    it.copy(isCapturing = false, error = CameraError.Storage(r.error))
                 }
             }
         }
     }
 
     fun onCaptureFailed() =
-        _state.update { it.copy(isCapturing = false, isRecording = false, error = CameraError.CaptureFailed) }
+        _state.update { it.copy(isCapturing = false, error = CameraError.CaptureFailed) }
 
     fun onBindFailed() = _state.update { it.copy(error = CameraError.BindFailed) }
 

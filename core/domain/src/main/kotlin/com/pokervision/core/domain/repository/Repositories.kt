@@ -7,7 +7,6 @@ import com.pokervision.core.model.media.MediaAsset
 import com.pokervision.core.model.media.MediaOrigin
 import com.pokervision.core.model.media.MediaType
 import com.pokervision.core.model.settings.AppSettings
-import com.pokervision.core.model.settings.KeyframeSensitivity
 import kotlinx.coroutines.flow.Flow
 
 /** Images and videos owned by the app (captured in-app or imported). Implemented in :core:data. */
@@ -61,10 +60,6 @@ interface SettingsRepository {
     suspend fun setAnalysisFps(fps: Int)
 
     suspend fun setConfidenceThresholds(minimumDetection: Float, autoConfirm: Float)
-
-    suspend fun setVideoSampleInterval(intervalMs: Long)
-
-    suspend fun setKeyframeSensitivity(sensitivity: KeyframeSensitivity)
 
     suspend fun resetToDefaults()
 }

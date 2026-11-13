@@ -11,14 +11,6 @@ import androidx.camera.core.Preview
 import androidx.camera.core.resolutionselector.ResolutionSelector
 import androidx.camera.core.resolutionselector.ResolutionStrategy
 import androidx.camera.lifecycle.ProcessCameraProvider
-import androidx.camera.video.FallbackStrategy
-import androidx.camera.video.FileOutputOptions
-import androidx.camera.video.Quality
-import androidx.camera.video.QualitySelector
-import androidx.camera.video.Recorder
-import androidx.camera.video.Recording
-import androidx.camera.video.VideoCapture
-import androidx.camera.video.VideoRecordEvent
 import androidx.camera.view.PreviewView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
@@ -30,8 +22,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import java.io.File
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
-
-enum class CaptureMode { PHOTO, VIDEO }
 
 enum class LensFacing { BACK, FRONT }
 
@@ -73,8 +63,8 @@ internal class FrameAnalyzer(
 }
 
 /**
- * Owns CameraX use cases. Binds Preview + ImageAnalysis + (ImageCapture | VideoCapture):
- * three use cases is the combination guaranteed on every hardware level, including LEGACY.
+ * Owns CameraX use cases: Preview + ImageAnalysis + ImageCapture (a combination guaranteed on every
+ * hardware level, including LEGACY). The analysis stream is where live card detection plugs in.
  *
  * Create once per screen, call [release] when the screen leaves composition.
  */
@@ -85,8 +75,6 @@ class CameraSession(private val context: Context, initialAnalysisFps: Int) {
 
     private var provider: ProcessCameraProvider? = null
     private var imageCapture: ImageCapture? = null
-    private var videoCapture: VideoCapture<Recorder>? = null
-    private var activeRecording: Recording? = null
     private var released = false
 
     private val _frameStats = MutableStateFlow(FrameStats())
@@ -101,7 +89,6 @@ class CameraSession(private val context: Context, initialAnalysisFps: Int) {
     fun bind(
         owner: LifecycleOwner,
         previewView: PreviewView,
-        mode: CaptureMode,
         lens: LensFacing,
         onError: (Throwable) -> Unit,
     ) {
@@ -134,26 +121,11 @@ class CameraSession(private val context: Context, initialAnalysisFps: Int) {
 
                 p.unbindAll()
                 imageCapture = null
-                videoCapture = null
-                when (mode) {
-                    CaptureMode.PHOTO -> {
-                        val capture = ImageCapture.Builder()
-                            .setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY)
-                            .build()
-                        p.bindToLifecycle(owner, selector, preview, analysis, capture)
-                        imageCapture = capture
-                    }
-                    CaptureMode.VIDEO -> {
-                        val recorder = Recorder.Builder()
-                            .setQualitySelector(
-                                QualitySelector.from(Quality.HD, FallbackStrategy.lowerQualityOrHigherThan(Quality.SD)),
-                            )
-                            .build()
-                        val capture = VideoCapture.withOutput(recorder)
-                        p.bindToLifecycle(owner, selector, preview, analysis, capture)
-                        videoCapture = capture
-                    }
-                }
+                val capture = ImageCapture.Builder()
+                    .setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY)
+                    .build()
+                p.bindToLifecycle(owner, selector, preview, analysis, capture)
+                imageCapture = capture
             } catch (e: Exception) {
                 onError(e)
             }
@@ -172,48 +144,8 @@ class CameraSession(private val context: Context, initialAnalysisFps: Int) {
         })
     }
 
-    val isRecording: Boolean get() = activeRecording != null
-
-    /**
-     * Starts video recording without audio (no microphone permission is requested by this app).
-     * [onProgress] reports recorded duration; [onFinished] is called once with success or error.
-     */
-    fun startRecording(
-        target: File,
-        onProgress: (durationMillis: Long) -> Unit,
-        onFinished: (error: Throwable?) -> Unit,
-    ) {
-        val capture = videoCapture ?: return onFinished(IllegalStateException("Video mode not bound"))
-        if (activeRecording != null) return
-        val options = FileOutputOptions.Builder(target).build()
-        activeRecording = capture.output
-            .prepareRecording(context, options)
-            .start(mainExecutor) { event ->
-                when (event) {
-                    is VideoRecordEvent.Status ->
-                        onProgress(event.recordingStats.recordedDurationNanos / 1_000_000)
-                    is VideoRecordEvent.Finalize -> {
-                        activeRecording = null
-                        if (event.hasError()) {
-                            target.delete()
-                            onFinished(event.cause ?: IllegalStateException("Recording error ${event.error}"))
-                        } else {
-                            onFinished(null)
-                        }
-                    }
-                    else -> Unit
-                }
-            }
-    }
-
-    fun stopRecording() {
-        activeRecording?.stop()
-    }
-
     fun release() {
         released = true
-        activeRecording?.stop()
-        activeRecording = null
         provider?.unbindAll()
         analysisExecutor.shutdown()
     }
