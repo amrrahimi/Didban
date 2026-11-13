@@ -9,8 +9,8 @@
 
     <string name="settings_detection_title">Model &amp; Detection</string>
     <string name="settings_model_title">Detection model</string>
-    <string name="settings_model_none">No model installed</string>
-    <string name="settings_model_none_desc">A trained card-detection model is not bundled yet. The app will not show card detections until one is installed. No mock results are displayed.</string>
+    <string name="settings_model_none">No model in this build</string>
+    <string name="settings_model_none_desc">This build does not include the card recognition model, so the Live Table cannot read cards. No made-up results are shown.</string>
     <string name="settings_fps">Analysis rate: %1$d FPS</string>
     <string name="settings_fps_help">How many camera frames per second are analysed. Higher values react faster but use more battery.</string>
     <string name="settings_min_confidence">Minimum detection confidence</string>
@@ -30,4 +30,8 @@
     <string name="settings_delete_all_confirm_body">All stored images, videos, games and hand histories will be permanently deleted and settings reset. Originals in your gallery are not affected.</string>
     <string name="settings_cleared">All local data deleted.</string>
     <string name="settings_export_planned">Exporting your game history (hand histories and reports) is planned together with statistics.</string>
+    <string name="settings_model_loading">Checking…</string>
+    <string name="settings_model_ready">Installed: %1$s</string>
+    <string name="settings_model_ready_desc">Recognises all 52 cards from their corner symbols, on this phone only. Published test: about 85% of cards found on real table video; a card is only used after it is seen in several frames in a row.</string>
+    <string name="settings_model_failed">Could not start</string>
 </resources>

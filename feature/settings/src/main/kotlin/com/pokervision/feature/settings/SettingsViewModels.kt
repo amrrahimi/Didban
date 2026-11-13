@@ -9,7 +9,10 @@ import com.pokervision.core.domain.usecase.ClearAllLocalDataUseCase
 import com.pokervision.core.domain.usecase.GetStorageUsageUseCase
 import com.pokervision.core.model.game.PokerVariant
 import com.pokervision.core.model.settings.AppSettings
+import com.pokervision.core.vision.CardDetector
+import com.pokervision.core.vision.DetectorStatus
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -17,6 +20,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 /**
@@ -26,7 +30,17 @@ import javax.inject.Inject
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
     private val repository: SettingsRepository,
+    private val cardDetector: CardDetector,
 ) : ViewModel() {
+
+    private val _modelStatus = MutableStateFlow<DetectorStatus>(DetectorStatus.Loading)
+    val modelStatus: StateFlow<DetectorStatus> = _modelStatus.asStateFlow()
+
+    val modelName: String get() = cardDetector.model.name
+
+    init {
+        viewModelScope.launch { _modelStatus.value = withContext(Dispatchers.IO) { cardDetector.prepare() } }
+    }
 
     val settings: StateFlow<AppSettings?> =
         repository.settings.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)

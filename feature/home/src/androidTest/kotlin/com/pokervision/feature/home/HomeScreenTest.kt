@@ -33,9 +33,9 @@ class HomeScreenTest {
         }
         compose.onNodeWithText("3").assertExists()
 
-        val advisorTitle = context.getString(R.string.home_tile_advisor)
-        compose.onNodeWithText(advisorTitle).performClick()
-        assertEquals(HomeEntry.ADVISOR, opened)
+        val liveTitle = context.getString(R.string.home_tile_live)
+        compose.onNodeWithText(liveTitle).performClick()
+        assertEquals(HomeEntry.LIVE_TABLE, opened)
 
         val privacyTitle = context.getString(R.string.home_tile_privacy)
         compose.onNode(hasScrollAction()).performScrollToNode(hasText(privacyTitle))

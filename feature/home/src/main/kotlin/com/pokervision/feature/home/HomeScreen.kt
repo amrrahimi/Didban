@@ -19,6 +19,7 @@ import androidx.compose.material.icons.outlined.PhotoCamera
 import androidx.compose.material.icons.outlined.PrivacyTip
 import androidx.compose.material.icons.outlined.Style
 import androidx.compose.material.icons.outlined.Tune
+import androidx.compose.material.icons.outlined.Videocam
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.LinearProgressIndicator
@@ -41,7 +42,7 @@ import com.pokervision.core.ui.text.label
 
 /** Destinations reachable from the dashboard. The app module maps them to navigation routes. */
 enum class HomeEntry {
-    ADVISOR, LIVE_CAMERA, IMAGE_ANALYSIS, HISTORY, STATISTICS,
+    LIVE_TABLE, ADVISOR, LIVE_CAMERA, IMAGE_ANALYSIS, HISTORY, STATISTICS,
     VARIANT_SELECTION, DETECTION_SETTINGS, PRIVACY_SETTINGS,
 }
 
@@ -55,6 +56,7 @@ private data class TileSpec(
 )
 
 private val TILES = listOf(
+    TileSpec(HomeEntry.LIVE_TABLE, R.string.home_tile_live, R.string.home_tile_live_sub, Icons.Outlined.Videocam),
     TileSpec(HomeEntry.ADVISOR, R.string.home_tile_advisor, R.string.home_tile_advisor_sub, Icons.Outlined.Lightbulb),
     TileSpec(HomeEntry.LIVE_CAMERA, R.string.home_tile_camera, R.string.home_tile_camera_sub, Icons.Outlined.PhotoCamera),
     TileSpec(HomeEntry.IMAGE_ANALYSIS, R.string.home_tile_image, R.string.home_tile_image_sub, Icons.Outlined.Image),

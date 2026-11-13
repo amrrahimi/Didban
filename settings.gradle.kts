@@ -35,10 +35,12 @@ include(":core:database")
 include(":core:data")
 include(":core:ui")
 include(":core:media")
+include(":core:vision")
 
 // Feature modules
 include(":feature:home")
 include(":feature:advisor")
+include(":feature:live")
 include(":feature:camera")
 include(":feature:imageanalysis")
 include(":feature:history")

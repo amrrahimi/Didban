@@ -27,6 +27,7 @@ android {
 dependencies {
     implementation(project(":core:ui"))
     implementation(project(":core:domain"))
+    implementation(project(":core:vision"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.activity.compose)

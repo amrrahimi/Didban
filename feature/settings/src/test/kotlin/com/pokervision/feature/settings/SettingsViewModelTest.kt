@@ -3,7 +3,11 @@ package com.pokervision.feature.settings
 import com.pokervision.core.domain.repository.SettingsRepository
 import com.pokervision.core.model.confidence.ConfidenceThresholds
 import com.pokervision.core.model.game.PokerVariant
+import com.pokervision.core.model.detection.ModelInfo
 import com.pokervision.core.model.settings.AppSettings
+import com.pokervision.core.vision.CardDetector
+import com.pokervision.core.vision.DetectorStatus
+import com.pokervision.core.vision.FrameDetections
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -32,6 +36,13 @@ class SettingsViewModelTest {
 
     private val repo = FakeRepo()
 
+    private object FakeDetector : CardDetector {
+        override val model = ModelInfo("fake", "0", isMock = true)
+        override val status: DetectorStatus = DetectorStatus.ModelMissing
+        override fun prepare(): DetectorStatus = status
+        override fun detect(image: android.graphics.Bitmap, scoreThreshold: Float) = FrameDetections(emptyList(), 0)
+    }
+
     @Before
     fun setUp() = Dispatchers.setMain(UnconfinedTestDispatcher())
 
@@ -40,25 +51,25 @@ class SettingsViewModelTest {
 
     @Test
     fun `raising minimum above auto-confirm drags auto-confirm up`() {
-        SettingsViewModel(repo).setThresholds(minimumDetection = 0.95f, autoConfirm = 0.9f, editedMinimum = true)
+        SettingsViewModel(repo, FakeDetector).setThresholds(minimumDetection = 0.95f, autoConfirm = 0.9f, editedMinimum = true)
         assertEquals(ConfidenceThresholds(0.95f, 0.95f), repo.state.value.confidenceThresholds)
     }
 
     @Test
     fun `lowering auto-confirm below minimum drags minimum down`() {
-        SettingsViewModel(repo).setThresholds(minimumDetection = 0.5f, autoConfirm = 0.3f, editedMinimum = false)
+        SettingsViewModel(repo, FakeDetector).setThresholds(minimumDetection = 0.5f, autoConfirm = 0.3f, editedMinimum = false)
         assertEquals(ConfidenceThresholds(0.3f, 0.3f), repo.state.value.confidenceThresholds)
     }
 
     @Test
     fun `fps is clamped to the allowed range`() {
-        SettingsViewModel(repo).setAnalysisFps(99)
+        SettingsViewModel(repo, FakeDetector).setAnalysisFps(99)
         assertEquals(AppSettings.ANALYSIS_FPS_RANGE.last, repo.state.value.analysisFps)
     }
 
     @Test
     fun `reset restores detection defaults`() {
-        val vm = SettingsViewModel(repo)
+        val vm = SettingsViewModel(repo, FakeDetector)
         vm.setAnalysisFps(12)
         vm.resetDetectionDefaults()
         assertEquals(AppSettings().analysisFps, repo.state.value.analysisFps)

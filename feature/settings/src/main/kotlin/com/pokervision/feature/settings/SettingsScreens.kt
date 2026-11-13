@@ -50,6 +50,7 @@ import com.pokervision.core.ui.component.StatusChip
 import com.pokervision.core.ui.text.formatBytes
 import com.pokervision.core.ui.text.label
 import com.pokervision.core.ui.text.userMessage
+import com.pokervision.core.vision.DetectorStatus
 import kotlin.math.roundToInt
 
 @Composable
@@ -122,7 +123,8 @@ fun DetectionSettingsRoute(onBack: () -> Unit, viewModel: SettingsViewModel = hi
             Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            ModelStatusCard()
+            val modelStatus by viewModel.modelStatus.collectAsStateWithLifecycle()
+            ModelStatusCard(modelStatus, viewModel.modelName)
             FpsSlider(s.analysisFps, viewModel::setAnalysisFps)
             ThresholdSlider(
                 title = stringResource(R.string.settings_min_confidence),
@@ -142,15 +144,23 @@ fun DetectionSettingsRoute(onBack: () -> Unit, viewModel: SettingsViewModel = hi
 }
 
 @Composable
-private fun ModelStatusCard() {
+private fun ModelStatusCard(status: DetectorStatus, modelName: String) {
     Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)) {
         Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(Icons.Outlined.Info, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
                 Text(stringResource(R.string.settings_model_title), style = MaterialTheme.typography.titleMedium, modifier = Modifier.padding(start = 8.dp))
             }
-            StatusChip(stringResource(R.string.settings_model_none))
-            Text(stringResource(R.string.settings_model_none_desc), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            val (chip, desc) = when (status) {
+                DetectorStatus.Loading -> stringResource(R.string.settings_model_loading) to ""
+                DetectorStatus.Ready -> stringResource(R.string.settings_model_ready, modelName) to stringResource(R.string.settings_model_ready_desc)
+                DetectorStatus.ModelMissing -> stringResource(R.string.settings_model_none) to stringResource(R.string.settings_model_none_desc)
+                is DetectorStatus.Failed -> stringResource(R.string.settings_model_failed) to status.message
+            }
+            StatusChip(chip)
+            if (desc.isNotEmpty()) {
+                Text(desc, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            }
         }
     }
 }

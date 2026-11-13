@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="live_title">میز زنده</string>
+    <string name="live_permission">برای خواندن کارت‌ها به دوربین نیاز است. تصاویر فقط روی همین گوشی پردازش می‌شوند و چیزی ذخیره یا بارگذاری نمی‌شود.</string>
+    <string name="live_permission_grant">اجازه دسترسی به دوربین</string>
+    <string name="live_camera_error">راه‌اندازی دوربین ممکن نشد. برنامه‌های دیگر دوربین را ببندید و دوباره تلاش کنید.</string>
+    <string name="live_model_loading">در حال آماده‌سازی تشخیص کارت…</string>
+    <string name="live_model_missing">مدل تشخیص کارت در این نسخه وجود ندارد.</string>
+    <string name="live_model_failed">مدل تشخیص کارت روی این گوشی اجرا نشد.</string>
+    <string name="live_too_many_cards">چند کارت دیده می‌شود: فقط دو کارت خودتان را نزدیک دوربین نشان دهید.</string>
+    <string name="live_show_hero">دو کارت خود را جلوی دوربین بگیرید (%1$d از ۲ خوانده شد)</string>
+    <string name="live_reading_flop">در حال خواندن فلاپ…</string>
+    <string name="live_watching_board">در حال دیدن کارت‌های زمین</string>
+    <string name="live_speed">%1$d میلی‌ثانیه · %2$s فریم</string>
+    <string name="live_my_cards">من</string>
+    <string name="live_board">زمین</string>
+    <string name="live_reject_question">%1$s حذف شود؟ (اشتباه خوانده شده)</string>
+    <string name="live_reject_yes">حذف</string>
+    <string name="live_reject_no">بماند</string>
+    <string name="live_action_bet">بِت / رِیز</string>
+    <string name="live_action_call">چک / کال</string>
+    <string name="live_action_fold">چک / فولد</string>
+    <string name="live_detail_bet">شما جلو هستید: اگر کسی شرط نبسته بِت کنید، اگر بسته رِیز کنید.</string>
+    <string name="live_detail_call_any">اگر می‌شود چک کنید. اگر کسی شرط بست، کال کردن با هر مقداری خوب است.</string>
+    <string name="live_detail_call_up_to">اگر می‌شود چک کنید. شرطی تا حدود %1$d٪ پات را کال کنید؛ اگر بیشتر بود فولد کنید.</string>
+    <string name="live_detail_fold">اگر می‌شود چک کنید. اگر کسی شرط بست، فولد کنید.</string>
+    <string name="live_equity_exact">شانس برد: %1$s (دقیق)</string>
+    <string name="live_equity_estimate">شانس برد: %1$s (±%2$s)</string>
+    <string name="live_waiting_hero">منتظر دو کارت شما…</string>
+    <string name="live_waiting_board">منتظر دیده شدن کامل فلاپ…</string>
+    <string name="live_opponents">حریف‌های داخل دست</string>
+    <string name="live_opponent_folded">یک حریف فولد کرد</string>
+    <string name="live_more_opponents">حریف بیشتر</string>
+    <string name="live_new_hand">دست جدید</string>
+    <string name="live_rescan">خواندن دوبارهٔ کارت‌هایم</string>
+    <string name="live_hand_high_card">کارت بالا</string>
+    <string name="live_hand_one_pair">یک جفت</string>
+    <string name="live_hand_two_pair">دو جفت</string>
+    <string name="live_hand_trips">سه‌تایی</string>
+    <string name="live_hand_straight">استریت</string>
+    <string name="live_hand_flush">فلاش</string>
+    <string name="live_hand_full_house">فول هاوس</string>
+    <string name="live_hand_quads">چهارتایی</string>
+    <string name="live_hand_straight_flush">استریت فلاش</string>
+</resources>

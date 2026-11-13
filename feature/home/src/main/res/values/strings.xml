@@ -7,7 +7,9 @@
     <string name="home_stat_hands">Hands</string>
     <string name="home_badge_phase">Phase %1$d</string>
 
-    <string name="home_tile_advisor">Live Advisor</string>
+    <string name="home_tile_live">Live Table</string>
+    <string name="home_tile_live_sub">Point the camera at the cards: automatic reading and advice</string>
+    <string name="home_tile_advisor">Manual Advisor</string>
     <string name="home_tile_advisor_sub">Enter your cards: odds and the suggested move in under a second</string>
     <string name="home_tile_camera">Live Camera</string>
     <string name="home_tile_camera_sub">Preview the table and take photos</string>

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="live_title">Live Table</string>
+    <string name="live_permission">The camera is needed to read the cards. Frames are processed on this phone only; nothing is saved or uploaded.</string>
+    <string name="live_permission_grant">Allow camera</string>
+    <string name="live_camera_error">Could not start the camera. Close other camera apps and try again.</string>
+    <string name="live_model_loading">Loading the card recognition model…</string>
+    <string name="live_model_missing">The card recognition model is not included in this build.</string>
+    <string name="live_model_failed">The card recognition model could not be started on this phone.</string>
+    <string name="live_too_many_cards">Several cards visible: show only your two cards, close to the camera.</string>
+    <string name="live_show_hero">Show your 2 cards to the camera (%1$d of 2 read)</string>
+    <string name="live_reading_flop">Reading the flop…</string>
+    <string name="live_watching_board">Watching the board</string>
+    <string name="live_speed">%1$d ms · %2$s fps</string>
+    <string name="live_my_cards">Mine</string>
+    <string name="live_board">Board</string>
+    <string name="live_reject_question">Remove %1$s? (wrongly read)</string>
+    <string name="live_reject_yes">Remove</string>
+    <string name="live_reject_no">Keep</string>
+    <string name="live_action_bet">BET / RAISE</string>
+    <string name="live_action_call">CHECK / CALL</string>
+    <string name="live_action_fold">CHECK / FOLD</string>
+    <string name="live_detail_bet">You are ahead: bet if nobody has bet, raise if someone has.</string>
+    <string name="live_detail_call_any">Check if you can. If someone bets, calling is fine at any size.</string>
+    <string name="live_detail_call_up_to">Check if you can. Call a bet up to about %1$d%% of the pot; fold to bigger bets.</string>
+    <string name="live_detail_fold">Check if you can. If anyone bets, fold.</string>
+    <string name="live_equity_exact">Chance to win: %1$s (exact)</string>
+    <string name="live_equity_estimate">Chance to win: %1$s (±%2$s)</string>
+    <string name="live_waiting_hero">Waiting for your two cards…</string>
+    <string name="live_waiting_board">Waiting for the flop to be fully visible…</string>
+    <string name="live_opponents">Opponents in the hand</string>
+    <string name="live_opponent_folded">An opponent folded</string>
+    <string name="live_more_opponents">More opponents</string>
+    <string name="live_new_hand">New hand</string>
+    <string name="live_rescan">Re-read my cards</string>
+    <string name="live_hand_high_card">High card</string>
+    <string name="live_hand_one_pair">One pair</string>
+    <string name="live_hand_two_pair">Two pair</string>
+    <string name="live_hand_trips">Three of a kind</string>
+    <string name="live_hand_straight">Straight</string>
+    <string name="live_hand_flush">Flush</string>
+    <string name="live_hand_full_house">Full house</string>
+    <string name="live_hand_quads">Four of a kind</string>
+    <string name="live_hand_straight_flush">Straight flush</string>
+</resources>

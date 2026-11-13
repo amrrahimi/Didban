@@ -7,7 +7,9 @@
     <string name="home_stat_hands">دست</string>
     <string name="home_badge_phase">فاز %1$d</string>
 
-    <string name="home_tile_advisor">مشاور زنده</string>
+    <string name="home_tile_live">میز زنده</string>
+    <string name="home_tile_live_sub">دوربین را رو به کارت‌ها بگیرید: خواندن خودکار و پیشنهاد</string>
+    <string name="home_tile_advisor">مشاور دستی</string>
     <string name="home_tile_advisor_sub">کارت‌ها را وارد کنید: شانس برد و حرکت پیشنهادی در کمتر از یک ثانیه</string>
     <string name="home_tile_camera">دوربین زنده</string>
     <string name="home_tile_camera_sub">پیش‌نمایش میز و عکس‌برداری</string>

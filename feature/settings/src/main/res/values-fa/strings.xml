@@ -9,8 +9,8 @@
 
     <string name="settings_detection_title">مدل و تشخیص</string>
     <string name="settings_model_title">مدل تشخیص</string>
-    <string name="settings_model_none">مدلی نصب نشده است</string>
-    <string name="settings_model_none_desc">مدل آموزش‌دیدهٔ تشخیص کارت هنوز همراه برنامه نیست. تا نصب مدل، برنامه هیچ تشخیصی نمایش نمی‌دهد. هیچ نتیجهٔ ساختگی نمایش داده نمی‌شود.</string>
+    <string name="settings_model_none">مدلی در این نسخه نیست</string>
+    <string name="settings_model_none_desc">این نسخه مدل تشخیص کارت را ندارد، پس «میز زنده» نمی‌تواند کارت‌ها را بخواند. هیچ نتیجهٔ ساختگی نمایش داده نمی‌شود.</string>
     <string name="settings_fps">نرخ تحلیل: %1$d فریم در ثانیه</string>
     <string name="settings_fps_help">تعداد فریم‌هایی از دوربین که در هر ثانیه تحلیل می‌شوند. مقدار بیشتر واکنش سریع‌تر ولی مصرف باتری بیشتری دارد.</string>
     <string name="settings_min_confidence">حداقل اطمینان تشخیص</string>
@@ -30,4 +30,8 @@
     <string name="settings_delete_all_confirm_body">همهٔ تصاویر، ویدیوها، بازی‌ها و تاریخچهٔ دست‌ها برای همیشه حذف و تنظیمات بازنشانی می‌شوند. فایل‌های اصلی در گالری شما تغییری نمی‌کنند.</string>
     <string name="settings_cleared">همهٔ داده‌های محلی حذف شد.</string>
     <string name="settings_export_planned">خروجی گرفتن از تاریخچهٔ بازی (تاریخچهٔ دست‌ها و گزارش‌ها) همراه با بخش آمار برنامه‌ریزی شده است.</string>
+    <string name="settings_model_loading">در حال بررسی…</string>
+    <string name="settings_model_ready">نصب‌شده: %1$s</string>
+    <string name="settings_model_ready_desc">هر ۵۲ کارت را از روی نماد گوشهٔ کارت، فقط روی همین گوشی، تشخیص می‌دهد. آزمایش منتشرشده: حدود ۸۵٪ کارت‌ها در ویدیوی واقعی میز پیدا شده‌اند؛ هر کارت فقط بعد از دیده شدن در چند فریم پشت سر هم استفاده می‌شود.</string>
+    <string name="settings_model_failed">اجرا نشد</string>
 </resources>
