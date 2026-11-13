@@ -108,6 +108,9 @@ class MediaFileStore @Inject constructor(
     fun deleteAll(): Boolean {
         // Keyframe images cached by app version 0.2 (video analysis was removed in 0.3).
         File(context.cacheDir, LEGACY_KEYFRAME_CACHE).deleteRecursively()
+        // "Learn my cards" photos and their exported zip.
+        File(context.filesDir, TRAINING_DIR).deleteRecursively()
+        File(context.cacheDir, EXPORT_DIR).deleteRecursively()
         return !root.exists() || root.deleteRecursively()
     }
 
@@ -116,5 +119,7 @@ class MediaFileStore @Inject constructor(
     private companion object {
         const val ROOT_DIR = "media"
         const val LEGACY_KEYFRAME_CACHE = "keyframes"
+        const val TRAINING_DIR = "training"
+        const val EXPORT_DIR = "export"
     }
 }

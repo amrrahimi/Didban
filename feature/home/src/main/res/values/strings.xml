@@ -9,6 +9,8 @@
 
     <string name="home_tile_live">Live Table</string>
     <string name="home_tile_live_sub">Point the camera at the cards: automatic reading and advice</string>
+    <string name="home_tile_learn">Learn my cards</string>
+    <string name="home_tile_learn_sub">Photograph your deck once so recognition works with your cards</string>
     <string name="home_tile_advisor">Manual Advisor</string>
     <string name="home_tile_advisor_sub">Enter your cards: odds and the suggested move in under a second</string>
     <string name="home_tile_camera">Live Camera</string>

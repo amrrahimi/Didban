@@ -33,6 +33,17 @@
             </intent-filter>
         </activity>
 
+        <!-- Shares the exported card-photo zip (from the cache) with the app the user picks. -->
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
+
         <!-- Persists the per-app language chosen in-app on Android 12 and below. -->
         <service
             android:name="androidx.appcompat.app.AppLocalesMetadataHolderService"

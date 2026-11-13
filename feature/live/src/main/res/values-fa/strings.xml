@@ -47,4 +47,19 @@
     <string name="live_pick_board_card">کدام کارت زمین؟</string>
     <string name="live_cancel">انصراف</string>
     <string name="live_focus_hint">کارت‌ها را داخل این مربع نگه دارید · برای فوکوس ضربه بزنید</string>
+    <string name="learn_title">یادگیری کارت‌های من</string>
+    <string name="learn_intro">برنامه از هر ۵۲ کارت شما عکس می‌گیرد تا مدل تشخیص روی دستهٔ کارت خودتان آموزش ببیند. برای این کار به دوربین نیاز است.</string>
+    <string name="learn_instruction_card">این کارت را رو به بالا و صاف روی میز، داخل مربع بگذارید. «شروع» را بزنید و گوشی را آرام حرکت دهید (نزدیک‌تر، دورتر، کمی کج) تا نوار پر شود.</string>
+    <string name="learn_instruction_background">همهٔ کارت‌ها را بردارید. دوربین را رو به میز خالی بگیرید، «شروع» را بزنید و گوشی را آرام حرکت دهید.</string>
+    <string name="learn_progress">عکس %1$d از %2$d · %3$d از %4$d انجام شد</string>
+    <string name="learn_capture">شروع</string>
+    <string name="learn_capturing">در حال عکس گرفتن… آرام حرکت دهید</string>
+    <string name="learn_retake">عکس‌برداری دوباره</string>
+    <string name="learn_send">ارسال عکس‌ها (%1$s)</string>
+    <string name="learn_delete_all">حذف عکس‌ها</string>
+    <string name="learn_delete_title">همهٔ عکس‌های کارت حذف شود؟</string>
+    <string name="learn_delete_body">همهٔ عکس‌هایی که در «یادگیری کارت‌های من» گرفته شده از این گوشی پاک می‌شوند.</string>
+    <string name="learn_tips">نکته‌ها: نور خوب، بدون انعکاس نور روی کارت، کل کارت داخل مربع. با ‹ › برگردید یا رد شوید. عکس‌ها تا وقتی «ارسال» را نزنید روی همین گوشی می‌مانند.</string>
+    <string name="learn_share_title">ارسال عکس‌های کارت</string>
+    <string name="learn_export_failed">ساخت فایل عکس‌ها ممکن نشد. فضای خالی گوشی را بررسی و دوباره تلاش کنید.</string>
 </resources>

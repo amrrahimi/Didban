@@ -47,4 +47,19 @@
     <string name="live_pick_board_card">Which board card?</string>
     <string name="live_cancel">Cancel</string>
     <string name="live_focus_hint">Keep the cards inside this square · tap to focus</string>
+    <string name="learn_title">Learn my cards</string>
+    <string name="learn_intro">The app will take photos of each of your 52 cards so a recognition model can be trained on your own deck. The camera is needed for this.</string>
+    <string name="learn_instruction_card">Lay this card face up and flat on the table inside the square. Press Start, then move the phone slowly (closer, farther, a little tilted) until the bar is full.</string>
+    <string name="learn_instruction_background">Remove all cards. Point the camera at the empty table, press Start and move the phone slowly.</string>
+    <string name="learn_progress">Photos %1$d of %2$d · %3$d of %4$d done</string>
+    <string name="learn_capture">Start</string>
+    <string name="learn_capturing">Taking photos… move slowly</string>
+    <string name="learn_retake">Retake</string>
+    <string name="learn_send">Send photos (%1$s)</string>
+    <string name="learn_delete_all">Delete photos</string>
+    <string name="learn_delete_title">Delete all card photos?</string>
+    <string name="learn_delete_body">All photos taken in Learn my cards will be removed from this phone.</string>
+    <string name="learn_tips">Tips: good light, no glare on the cards, the whole card inside the square. Use ‹ › to go back or skip. Photos stay on this phone until you press Send.</string>
+    <string name="learn_share_title">Send card photos</string>
+    <string name="learn_export_failed">Could not create the photo package. Check free storage and try again.</string>
 </resources>
