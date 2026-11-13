@@ -23,15 +23,16 @@ Dependencies always point inward: `feature → domain → model/common`. `data` 
 |---|---|---|
 | `:core:common` | Kotlin/JVM | `AppResult`/`AppError`, `AppLogger`, `FrameRateLimiter`, `ThroughputMeter` |
 | `:core:model` | Kotlin/JVM | Cards, deck types, confidence, `GameState`, `CardSlot`, detection & equity result types, `GameStateValidator` |
-| `:core:domain` | Kotlin/JVM | Repository interfaces, use cases, `MediaTypePolicy`, frame sampling / keyframe selection / resize math, `ExtractKeyframesUseCase` |
+| `:core:poker` | Kotlin/JVM | Hand evaluator, Hold'em equity (exact / Monte Carlo), pot odds, EV, `BasicAdvisor` |
+| `:core:domain` | Kotlin/JVM | Repository interfaces, use cases (incl. `AnalyzeHoldemUseCase`), `MediaTypePolicy`, image geometry |
 | `:core:database` | Android lib | Room DB v1: `media_assets`, `games`, `hand_histories`; DAOs; migration policy |
 | `:core:data` | Android lib | Repository implementations, `MediaFileStore`, DataStore settings, Hilt bindings, `AndroidLogger` |
-| `:core:media` | Android lib | Video frame reader (MediaMetadataRetriever), `BitmapOps` (EXIF, resize, rotate, luma fingerprint, atomic JPEG), keyframe cache, video thumbnails |
+| `:core:media` | Android lib | `BitmapOps` (EXIF, resize, rotate, luma fingerprint, atomic JPEG) |
 | `:core:ui` | Android lib | Dark poker theme, shared components (confidence indicator, planned-feature notice, card view), formatting, shared strings |
 | `:feature:home` | Android lib | Dashboard (screen 1) |
-| `:feature:camera` | Android lib | CameraX preview / photo / video / throttled analysis stream (screen 2) |
+| `:feature:advisor` | Android lib | Live Advisor: card input and instant recommendation |
+| `:feature:camera` | Android lib | CameraX preview / photo / throttled analysis stream for live detection (screen 2) |
 | `:feature:imageanalysis` | Android lib | Image import, gallery, detail (screen 3) |
-| `:feature:videoanalysis` | Android lib | Video import, list, Media3 playback (screen 4) |
 | `:feature:history` | Android lib | Media and game history (screen 6) |
 | `:feature:settings` | Android lib | Variant selection (8), model & detection (9), privacy & storage (10) |
 | `:app` | Application | Hilt app, single activity, navigation, language switching, placeholder screens 5 & 7 |

@@ -25,22 +25,29 @@ CI: GitHub Actions on branch `poker-vision` runs all unit tests, builds the APK,
 
 **Phase 1 exit criterion still open:** manual check on a real phone (camera capture/recording, import, playback, Persian RTL, delete-all).
 
-## Phase 2 — Camera, image and video input ✅ (CI green)
+## Phase 2 — Camera and image input ✅
+
+Video analysis (import, playback, keyframe extraction) was built and then **removed at the user's request (v0.3)**: the goal is live analysis from the camera, not recorded video. Kept from that work: EXIF-aware image sizes, `BitmapOps` (resize, rotate, luma fingerprint, atomic JPEG; `BitmapOpsTest` on emulator) and Room v2 (`MIGRATION_1_2`, tested).
+
+## Direction change (v0.3): live advisor
+
+The product goal is a **live advisor for learning and friendly games where all players know it is used**: the camera recognises cards and the app immediately suggests fold / check / call / bet / raise. Decision time in live poker is typically 10–30 s (TDA clock: 25 s + 5 s), so the target is a full answer in under ~1 s.
 
 | Item | Status | Verification |
 |---|---|---|
-| Frame sampling plan (configurable interval, cap of 600 samples) | ✅ | `FrameSamplingTest` |
-| Keyframe selection (32×32 luma fingerprint, min/max gap, 3 sensitivities) | ✅ | `FrameSamplingTest`, `ExtractKeyframesUseCaseTest` (progress, cancel, undecodable frames) |
-| Video frame decoding (MediaMetadataRetriever, OPTION_CLOSEST, scaled on API 27+) | 🟡 | needs a real-phone check with a recorded game |
-| Image utilities: EXIF orientation, subsampled decode, resize, rotate, luma, atomic JPEG | ✅ | `BitmapOpsTest` on emulator |
-| Keyframe cache (locale-safe filenames, cleared on delete / delete-all) | ✅ | `BitmapOpsTest` (Persian locale), `UseCasesTest` |
-| Room v2: video thumbnails, `MIGRATION_1_2` | ✅ | `MigrationTest` 1→2 preserves rows; schema 2 committed |
-| UI: keyframe filmstrip with seek, thumbnails in lists, video settings | 🟡 | `SettingsViewModelTest`; manual check pending |
+| `core:poker` Hold'em evaluator (5–7 cards) | ✅ | all 2,598,960 five-card hands match known category counts; 20,000 random 7-card hands match best-of-21 |
+| Equity: exact enumeration (heads-up turn/river) and seeded Monte Carlo with 95% CI; dead cards | ✅ | matches published values (AA 85.2%, 72o 34.6%, AA vs 5 ≈49%); exact vs simulated agree |
+| Pot odds, call EV, explainable basic advisor | ✅ | `EquityAndAdviceTest` |
+| Speed | ✅ | desktop JVM: 9 opponents 14 ms; phone expected well under 0.5 s (to be measured on device) |
+| Live Advisor screen (card picker, opponents, pot, to call, instant advice) | 🟡 | `AdvisorInputReducerTest`; manual phone check pending |
 
 ## Next
 
-| Phase | Scope |
+| Step | Scope |
 |---|---|
+| A | **Card detection model** (needs real photos of the user's cards — see ML_PIPELINE.md); camera fills the advisor automatically; temporal confirmation so uncertain detections are never used |
+| B | Omaha, Omaha Hi-Lo, Short Deck, Stud, Draw in the advisor (Stud uses seen up-cards as dead cards) |
+| C | Opponent-range awareness (tighter ranges when opponents bet big) to improve advice quality |
 | 3 | `:core:vision`: `CardDetector` interface, clearly labelled mock, LiteRT/ONNX runtime, YOLO post-processing (NMS), IoU tracker; `ml/` training pipeline |
 | 4 | Game-state reconstruction, temporal agreement for confirmation, manual correction UI |
 | 5 | Texas Hold'em evaluator (7-card best-5), exhaustive tests |

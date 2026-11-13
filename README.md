@@ -1,8 +1,8 @@
 # Poker Vision AI (Android)
 
-Offline poker analysis for **education, training and post-game review**: capture or import table photos and videos, recognise cards (planned), reconstruct game state and compute probabilities with deterministic poker math. Not intended for real-time assistance where it is prohibited.
+Offline poker **live advisor for learning and friendly games where every player knows it is used**: enter (and, once the detection model exists, photograph) the cards and get odds plus a suggested move in under a second. Card rooms and online sites prohibit this kind of assistance; do not use it there.
 
-**Status: Phase 2 complete (camera, image and video input incl. keyframe extraction).** See [docs/PROGRESS.md](docs/PROGRESS.md) and [docs/KNOWN_LIMITATIONS.md](docs/KNOWN_LIMITATIONS.md).
+**Status: v0.3 — Live Advisor for Texas Hold'em (manual card entry). Automatic card recognition is next.** See [docs/PROGRESS.md](docs/PROGRESS.md) and [docs/KNOWN_LIMITATIONS.md](docs/KNOWN_LIMITATIONS.md).
 
 ## What works in Phase 1 (code complete, awaiting first Android build)
 - Home dashboard with live counts and navigation to all 10 screens
