@@ -142,6 +142,18 @@ class VisionPipelineTest {
     }
 
     @Test
+    fun `manual add fills slots and respects limits`() {
+        var hand = LiveHandAssembler.addManual(LiveHand(), c("As"), toHero = true)
+        hand = LiveHandAssembler.addManual(hand, c("As"), toHero = true) // duplicate ignored
+        hand = LiveHandAssembler.addManual(hand, c("Kd"), toHero = true)
+        assertEquals(LivePhase.WATCH_BOARD, hand.phase)
+        hand = LiveHandAssembler.addManual(hand, c("2c"), toHero = true) // hero full
+        assertEquals(2, hand.hero.size)
+        hand = LiveHandAssembler.addManual(hand, c("2c"), toHero = false)
+        assertEquals(listOf(c("2c")), hand.board)
+    }
+
+    @Test
     fun `rejecting a hero card returns to scanning and new hand keeps opponents`() {
         var hand = LiveHand(hero = listOf(c("As"), c("Kh")), board = listOf(c("2c")), opponents = 4, phase = LivePhase.WATCH_BOARD)
         hand = LiveHandAssembler.reject(hand, c("Kh"))

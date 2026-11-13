@@ -115,6 +115,20 @@ object LiveHandAssembler {
         )
     }
 
+    /** Manual fallback when the camera misses a card. Ignored if the card is already used or the slot is full. */
+    fun addManual(hand: LiveHand, card: PlayingCard, toHero: Boolean): LiveHand {
+        if (card in hand.hero || card in hand.board) return hand
+        val cleared = hand.copy(rejected = hand.rejected - card)
+        return if (toHero) {
+            if (hand.hero.size >= 2) return hand
+            val hero = hand.hero + card
+            cleared.copy(hero = hero, phase = if (hero.size == 2) LivePhase.WATCH_BOARD else LivePhase.SCAN_HERO, tooManyCardsForHero = false)
+        } else {
+            if (hand.board.size >= 5) return hand
+            cleared.copy(board = hand.board + card)
+        }
+    }
+
     fun rescanHero(hand: LiveHand) = hand.copy(hero = emptyList(), phase = LivePhase.SCAN_HERO, tooManyCardsForHero = false)
 
     fun setOpponents(hand: LiveHand, n: Int) = hand.copy(opponents = n.coerceIn(1, 9))

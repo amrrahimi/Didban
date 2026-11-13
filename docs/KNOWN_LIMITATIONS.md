@@ -4,7 +4,12 @@
 - Builds and all automated tests pass in GitHub Actions. Camera, import and playback have not yet been checked by hand on a real phone (emulator camera is not representative).
 
 ## Functional
-- **No automatic card recognition yet:** cards are entered by tapping. A trained detection model is required (needs real photos of physical cards).
+- **Card recognition accuracy on real tables is not yet measured.** The bundled third-party model was trained mostly on synthetic images; its publisher reports ~85% recall on real video and gaps on some black court cards. Missed cards can be added by tapping an empty slot.
+- Chips and pot size are not read by the camera (unreliable); advice is expressed as the largest bet you can call relative to the pot.
+- The camera cannot tell who folded; the user adjusts the opponent count with −/+.
+- Hole cards must be shown to the camera on their own first; if more than two unknown cards are visible the app asks instead of guessing.
+- Model weights are AGPL-3.0 (third party). Fine for personal use; distributing the app requires complying with AGPL.
+- APK is ~106 MB (model 38 MB + ONNX Runtime for three CPU types).
 - **Advisor covers Texas Hold'em only.** Other variants show a notice.
 - **Advice quality:** opponents are modelled as holding random cards. Real opponents who stay in or bet big usually hold stronger hands, so the advice is too optimistic in those spots. Position, bet sizing, bluffing and future betting rounds are ignored. It is a learning aid, not a solver.
 - "Improving cards" counts cards that improve hero's own hand category, not true outs against an opponent's hand.

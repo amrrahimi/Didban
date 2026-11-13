@@ -41,6 +41,19 @@ The product goal is a **live advisor for learning and friendly games where all p
 | Speed | ✅ | desktop JVM: 9 opponents 14 ms; phone expected well under 0.5 s (to be measured on device) |
 | Live Advisor screen (card picker, opponents, pot, to call, instant advice) | 🟡 | `AdvisorInputReducerTest`; manual phone check pending |
 
+## v0.4 — Live Table (automatic card reading)
+
+| Item | Status | Verification |
+|---|---|---|
+| Card model: sroot/lgd-cards-gen3 (YOLO11s, 52 classes, corner pips), checksum-pinned, fetched in CI | ✅ | ONNX inspected in CI: input `images` [1,3,640,640], output [1,56,8400], no NMS |
+| ONNX Runtime on device (XNNPACK) | ✅ | `OnnxCardDetectorTest`: model loads on emulator; blank frame → no cards |
+| Kotlin pipeline (letterbox, decode, NMS, pip clustering) | ✅ | Same results as an independent Python reference on 16 real card photos (identical hits, scores within ±0.01) |
+| Multi-frame confirmation, hero/board assembly, reject, manual add | ✅ | `VisionPipelineTest` |
+| Chip-free live advice (largest callable bet as % of pot) | ✅ | `LiveAdviceTest`, `LiveAnalysisTest` |
+| Live Table screen | 🟡 | needs testing on a real phone at a real table |
+
+**Measured so far (honest):** on 16 small (224×224) public card photos the model found 2 cards, both correct; one wrong guess (score 0.41) stayed below the confirmation threshold. These photos are far smaller than live camera frames, so real-table accuracy is still unknown. The model's publisher reports ~85% recall on real table video. Inference: ~350–450 ms per frame on the CI emulator.
+
 ## Next
 
 | Step | Scope |

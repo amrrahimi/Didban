@@ -42,4 +42,8 @@
     <string name="live_hand_full_house">Full house</string>
     <string name="live_hand_quads">Four of a kind</string>
     <string name="live_hand_straight_flush">Straight flush</string>
+    <string name="live_add_card">Add a card the camera missed</string>
+    <string name="live_pick_my_card">Which is your card?</string>
+    <string name="live_pick_board_card">Which board card?</string>
+    <string name="live_cancel">Cancel</string>
 </resources>

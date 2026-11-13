@@ -111,6 +111,8 @@ class LiveViewModel @Inject constructor(
 
     fun rejectCard(card: PlayingCard) = _hand.update { LiveHandAssembler.reject(it, card) }
 
+    fun addManual(card: PlayingCard, toHero: Boolean) = _hand.update { LiveHandAssembler.addManual(it, card, toHero) }
+
     fun rescanHero() {
         resetConfirmer = true
         _hand.update { LiveHandAssembler.rescanHero(it) }

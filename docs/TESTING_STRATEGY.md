@@ -14,6 +14,8 @@
 | `UseCasesTest`, `ImageGeometryTest` | 12 | passing |
 | `HandEvaluatorTest` (incl. exhaustive 5-card), `EquityAndAdviceTest` | 18 | passing |
 | `AdvisorInputReducerTest` | 7 | passing |
+| `VisionPipelineTest`, `LiveAnalysisTest`, `LiveAdviceTest` | 18 | passing |
+| `OnnxCardDetectorTest`, `RealCardSampleTest` (instrumented, real model) | 3 | passing; real-photo results logged and cross-checked with `scripts/reference_detect.py` |
 | `SettingsDecoderTest` | 3 | passing |
 | `SettingsViewModelTest`, `RoutesTest` | 6 | passing (CI) |
 | `DaoTest`, `MigrationTest` (incl. 1→2), `BitmapOpsTest`, `HomeScreenTest` (instrumented) | 11 | passing (CI emulator, API 30) |

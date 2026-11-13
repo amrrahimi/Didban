@@ -33,6 +33,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -62,6 +63,7 @@ import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.compose.ui.window.Dialog
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.LocalLifecycleOwner
@@ -70,6 +72,8 @@ import com.pokervision.core.domain.usecase.LiveAnalysis
 import com.pokervision.core.domain.vision.LiveHand
 import com.pokervision.core.domain.vision.LivePhase
 import com.pokervision.core.model.card.PlayingCard
+import com.pokervision.core.model.card.Rank
+import com.pokervision.core.model.card.Suit
 import com.pokervision.core.poker.advice.LiveAction
 import com.pokervision.core.poker.holdem.HandCategory
 import com.pokervision.core.ui.component.ErrorBanner
@@ -143,7 +147,7 @@ private fun LiveContent(viewModel: LiveViewModel) {
 
         Column(Modifier.align(Alignment.TopCenter).fillMaxWidth()) {
             StatusBanner(vision, hand)
-            CardsPanel(hand, onReject = viewModel::rejectCard)
+            CardsPanel(hand, onReject = viewModel::rejectCard, onAdd = viewModel::addManual)
         }
 
         AdvicePanel(
@@ -218,18 +222,28 @@ private fun StatusBanner(vision: LiveVisionState, hand: LiveHand) {
 }
 
 @Composable
-private fun CardsPanel(hand: LiveHand, onReject: (PlayingCard) -> Unit) {
+private fun CardsPanel(hand: LiveHand, onReject: (PlayingCard) -> Unit, onAdd: (PlayingCard, Boolean) -> Unit) {
     var pendingReject by remember { mutableStateOf<PlayingCard?>(null) }
+    /** Non-null while the manual picker is open: true = adding to my cards, false = to the board. */
+    var addingToHero by remember { mutableStateOf<Boolean?>(null) }
     Row(
         Modifier.fillMaxWidth().background(Color.Black.copy(alpha = 0.45f)).padding(8.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(6.dp),
     ) {
         Text(stringResource(R.string.live_my_cards), color = Color.White, style = MaterialTheme.typography.labelMedium)
-        SlotCards(hand.hero, 2) { pendingReject = it }
+        SlotCards(hand.hero, 2, onEmptyTap = { addingToHero = true }) { pendingReject = it }
         Spacer(Modifier.width(8.dp))
         Text(stringResource(R.string.live_board), color = Color.White, style = MaterialTheme.typography.labelMedium)
-        SlotCards(hand.board, 5) { pendingReject = it }
+        SlotCards(hand.board, 5, onEmptyTap = { addingToHero = false }) { pendingReject = it }
+    }
+    addingToHero?.let { toHero ->
+        ManualCardPicker(
+            used = (hand.hero + hand.board).toSet(),
+            title = stringResource(if (toHero) R.string.live_pick_my_card else R.string.live_pick_board_card),
+            onPick = { onAdd(it, toHero); addingToHero = null },
+            onDismiss = { addingToHero = null },
+        )
     }
     pendingReject?.let { card ->
         Row(
@@ -244,13 +258,56 @@ private fun CardsPanel(hand: LiveHand, onReject: (PlayingCard) -> Unit) {
 }
 
 @Composable
-private fun SlotCards(cards: List<PlayingCard>, slots: Int, onTap: (PlayingCard) -> Unit) {
+private fun SlotCards(cards: List<PlayingCard>, slots: Int, onEmptyTap: () -> Unit, onTap: (PlayingCard) -> Unit) {
+    val addLabel = stringResource(R.string.live_add_card)
     for (i in 0 until slots) {
         val card = cards.getOrNull(i)
         if (card != null) {
             PlayingCardView(card, Modifier.size(width = 30.dp, height = 42.dp).clickable { onTap(card) })
         } else {
-            Box(Modifier.size(width = 30.dp, height = 42.dp).border(1.dp, Color.White.copy(alpha = 0.5f), RoundedCornerShape(4.dp)))
+            Box(
+                Modifier.size(width = 30.dp, height = 42.dp)
+                    .border(1.dp, Color.White.copy(alpha = 0.5f), RoundedCornerShape(4.dp))
+                    .clickable(onClick = onEmptyTap)
+                    .semantics { contentDescription = addLabel },
+                contentAlignment = Alignment.Center,
+            ) { Text("+", color = Color.White.copy(alpha = 0.7f)) }
+        }
+    }
+}
+
+/** Fallback when the camera does not read a card: pick it from all 52. */
+@Composable
+private fun ManualCardPicker(used: Set<PlayingCard>, title: String, onPick: (PlayingCard) -> Unit, onDismiss: () -> Unit) {
+    Dialog(onDismissRequest = onDismiss) {
+        Surface(shape = RoundedCornerShape(16.dp), color = MaterialTheme.colorScheme.surface) {
+            Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                Text(title, style = MaterialTheme.typography.titleMedium)
+                listOf(Suit.SPADES, Suit.HEARTS, Suit.DIAMONDS, Suit.CLUBS).forEach { suit ->
+                    Row(horizontalArrangement = Arrangement.spacedBy(2.dp)) {
+                        Rank.entries.reversed().forEach { rank ->
+                            val card = PlayingCard(rank, suit)
+                            val isUsed = card in used
+                            Box(
+                                contentAlignment = Alignment.Center,
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .height(40.dp)
+                                    .background(if (isUsed) Color.Gray else PokerColors.Ivory, RoundedCornerShape(4.dp))
+                                    .clickable(enabled = !isUsed) { onPick(card) }
+                                    .semantics { contentDescription = card.code },
+                            ) {
+                                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                    val color = if (suit.isRed) PokerColors.CardRed else PokerColors.CardBlack
+                                    Text(rank.symbol.toString(), color = color, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                                    Text(suit.glyph.toString(), color = color, fontSize = 11.sp)
+                                }
+                            }
+                        }
+                    }
+                }
+                TextButton(onClick = onDismiss, modifier = Modifier.align(Alignment.End)) { Text(stringResource(R.string.live_cancel)) }
+            }
         }
     }
 }

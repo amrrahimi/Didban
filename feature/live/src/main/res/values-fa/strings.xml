@@ -42,4 +42,8 @@
     <string name="live_hand_full_house">فول هاوس</string>
     <string name="live_hand_quads">چهارتایی</string>
     <string name="live_hand_straight_flush">استریت فلاش</string>
+    <string name="live_add_card">افزودن کارتی که دوربین نخواند</string>
+    <string name="live_pick_my_card">کارت شما کدام است؟</string>
+    <string name="live_pick_board_card">کدام کارت زمین؟</string>
+    <string name="live_cancel">انصراف</string>
 </resources>

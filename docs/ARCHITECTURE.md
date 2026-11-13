@@ -27,10 +27,12 @@ Dependencies always point inward: `feature → domain → model/common`. `data` 
 | `:core:domain` | Kotlin/JVM | Repository interfaces, use cases (incl. `AnalyzeHoldemUseCase`), `MediaTypePolicy`, image geometry |
 | `:core:database` | Android lib | Room DB v1: `media_assets`, `games`, `hand_histories`; DAOs; migration policy |
 | `:core:data` | Android lib | Repository implementations, `MediaFileStore`, DataStore settings, Hilt bindings, `AndroidLogger` |
+| `:core:vision` | Android lib | ONNX Runtime card detector (`OnnxCardDetector`), model from `scripts/fetch_card_model.sh` |
 | `:core:media` | Android lib | `BitmapOps` (EXIF, resize, rotate, luma fingerprint, atomic JPEG) |
 | `:core:ui` | Android lib | Dark poker theme, shared components (confidence indicator, planned-feature notice, card view), formatting, shared strings |
 | `:feature:home` | Android lib | Dashboard (screen 1) |
-| `:feature:advisor` | Android lib | Live Advisor: card input and instant recommendation |
+| `:feature:live` | Android lib | Live Table: camera, detection overlay, automatic hand building, chip-free advice |
+| `:feature:advisor` | Android lib | Manual advisor: card input and instant recommendation |
 | `:feature:camera` | Android lib | CameraX preview / photo / throttled analysis stream for live detection (screen 2) |
 | `:feature:imageanalysis` | Android lib | Image import, gallery, detail (screen 3) |
 | `:feature:history` | Android lib | Media and game history (screen 6) |
