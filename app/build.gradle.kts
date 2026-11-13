@@ -16,7 +16,7 @@ android {
         targetSdk = 35
         // CI build number, so each new APK installs as an update over the previous one.
         versionCode = System.getenv("GITHUB_RUN_NUMBER")?.toIntOrNull() ?: 1
-        versionName = "0.4.0-live"
+        versionName = "0.4.1-accuracy"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         // Only ship the languages the app is translated into (keep in sync with res/xml/locales_config.xml).
         resourceConfigurations += listOf("en", "fa")

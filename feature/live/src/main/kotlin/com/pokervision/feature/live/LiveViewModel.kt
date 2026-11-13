@@ -8,6 +8,7 @@ import com.pokervision.core.domain.repository.SettingsRepository
 import com.pokervision.core.domain.usecase.AnalyzeLiveHandUseCase
 import com.pokervision.core.domain.usecase.LiveAnalysis
 import com.pokervision.core.domain.vision.CardConfirmer
+import com.pokervision.core.domain.vision.FocusRegion
 import com.pokervision.core.domain.vision.LiveHand
 import com.pokervision.core.domain.vision.LiveHandAssembler
 import com.pokervision.core.model.card.PlayingCard
@@ -43,6 +44,8 @@ data class LiveVisionState(
     val inferenceMillis: Long = 0,
     val analysedFps: Double = 0.0,
     val cameraError: Boolean = false,
+    /** The "card area" square (normalized to the frame); only cards inside it are read. */
+    val focusArea: BoundingBox? = null,
 )
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -93,13 +96,22 @@ class LiveViewModel @Inject constructor(
             confirmer = newConfirmer()
             resetConfirmer = false
         }
-        val result = detector.detect(frame, DECODE_THRESHOLD)
-        val state = confirmer.update(result.sightings)
+        // Read only the central card area, at close to native resolution (bigger symbols for the model).
+        val crop = FocusRegion.centerSquare(frame.width, frame.height)
+        val area = Bitmap.createBitmap(frame, crop.left, crop.top, crop.width, crop.height)
+        val result = try {
+            detector.detect(area, DECODE_THRESHOLD)
+        } finally {
+            if (area !== frame) area.recycle()
+        }
+        val sightings = result.sightings.map { it.copy(box = FocusRegion.toFrame(it.box, crop, frame.width, frame.height)) }
+        val state = confirmer.update(sightings)
         meter.record(System.nanoTime())
         _hand.update { LiveHandAssembler.onConfirmed(it, state.confirmed.keys) }
         _vision.update {
             it.copy(
-                overlay = result.sightings.map { s -> OverlayBox(s.card, s.box, s.card in state.confirmed) },
+                overlay = sightings.map { s -> OverlayBox(s.card, s.box, s.card in state.confirmed) },
+                focusArea = FocusRegion.normalized(crop, frame.width, frame.height),
                 frameAspect = frame.width.toFloat() / frame.height,
                 inferenceMillis = result.inferenceMillis,
                 analysedFps = meter.fps(),

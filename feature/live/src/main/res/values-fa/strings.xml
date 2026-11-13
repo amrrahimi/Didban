@@ -8,7 +8,7 @@
     <string name="live_model_missing">مدل تشخیص کارت در این نسخه وجود ندارد.</string>
     <string name="live_model_failed">مدل تشخیص کارت روی این گوشی اجرا نشد.</string>
     <string name="live_too_many_cards">چند کارت دیده می‌شود: فقط دو کارت خودتان را نزدیک دوربین نشان دهید.</string>
-    <string name="live_show_hero">دو کارت خود را جلوی دوربین بگیرید (%1$d از ۲ خوانده شد)</string>
+    <string name="live_show_hero">دو کارت خود را داخل مربع نشان دهید (%1$d از ۲ خوانده شد)</string>
     <string name="live_reading_flop">در حال خواندن فلاپ…</string>
     <string name="live_watching_board">در حال دیدن کارت‌های زمین</string>
     <string name="live_speed">%1$d میلی‌ثانیه · %2$s فریم</string>
@@ -46,4 +46,5 @@
     <string name="live_pick_my_card">کارت شما کدام است؟</string>
     <string name="live_pick_board_card">کدام کارت زمین؟</string>
     <string name="live_cancel">انصراف</string>
+    <string name="live_focus_hint">کارت‌ها را داخل این مربع نگه دارید · برای فوکوس ضربه بزنید</string>
 </resources>

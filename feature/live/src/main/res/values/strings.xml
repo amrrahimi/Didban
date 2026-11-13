@@ -8,7 +8,7 @@
     <string name="live_model_missing">The card recognition model is not included in this build.</string>
     <string name="live_model_failed">The card recognition model could not be started on this phone.</string>
     <string name="live_too_many_cards">Several cards visible: show only your two cards, close to the camera.</string>
-    <string name="live_show_hero">Show your 2 cards to the camera (%1$d of 2 read)</string>
+    <string name="live_show_hero">Show your 2 cards inside the square (%1$d of 2 read)</string>
     <string name="live_reading_flop">Reading the flop…</string>
     <string name="live_watching_board">Watching the board</string>
     <string name="live_speed">%1$d ms · %2$s fps</string>
@@ -46,4 +46,5 @@
     <string name="live_pick_my_card">Which is your card?</string>
     <string name="live_pick_board_card">Which board card?</string>
     <string name="live_cancel">Cancel</string>
+    <string name="live_focus_hint">Keep the cards inside this square · tap to focus</string>
 </resources>

@@ -85,11 +85,12 @@ class VisionPipelineTest {
         assertEquals(1, s.pipCount)
     }
 
-    private fun sight(code: String, score: Float = 0.8f) = CardSighting(c(code), score, BoundingBox(0f, 0f, 0.1f, 0.1f), 2)
+    private fun sight(code: String, score: Float = 0.8f, pips: Int = 1) =
+        CardSighting(c(code), score, BoundingBox(0f, 0f, 0.1f, 0.1f), pips)
 
     @Test
     fun `confirmer requires repeated sightings`() {
-        val conf = CardConfirmer(window = 4, requiredHits = 3, minScore = 0.5f)
+        val conf = CardConfirmer(window = 4, requiredWeight = 3, minScore = 0.5f)
         assertTrue(conf.update(listOf(sight("As"))).confirmed.isEmpty())
         assertTrue(conf.update(listOf(sight("As"), sight("2c", 0.3f))).confirmed.isEmpty()) // 2c below min score
         val s = conf.update(listOf(sight("As")))
@@ -99,9 +100,41 @@ class VisionPipelineTest {
 
     @Test
     fun `one-frame flicker never confirms`() {
-        val conf = CardConfirmer(window = 6, requiredHits = 3)
-        conf.update(listOf(sight("7d")))
-        repeat(5) { assertFalse(c("7d") in conf.update(emptyList()).confirmed) }
+        val conf = CardConfirmer(window = 8, requiredWeight = 4)
+        conf.update(listOf(sight("7d", pips = 2)))
+        repeat(7) { assertFalse(c("7d") in conf.update(emptyList()).confirmed) }
+    }
+
+    @Test
+    fun `both corners agreeing confirms faster than a single corner`() {
+        val twoCorners = CardConfirmer() // default: weight 4 in 8 frames
+        twoCorners.update(listOf(sight("Ah", pips = 2)))
+        assertTrue(c("Ah") in twoCorners.update(listOf(sight("Ah", pips = 2))).confirmed)
+
+        val oneCorner = CardConfirmer()
+        repeat(3) { assertFalse(c("4h") in oneCorner.update(listOf(sight("4h"))).confirmed) }
+        assertTrue(c("4h") in oneCorner.update(listOf(sight("4h"))).confirmed)
+    }
+
+    @Test
+    fun `ace and four flip-flopping on one corner each does not confirm quickly`() {
+        val conf = CardConfirmer()
+        // Same card, corners disagree every frame: A on one corner, 4 on the other.
+        repeat(3) {
+            val s = conf.update(listOf(sight("As"), sight("4s")))
+            assertTrue(s.confirmed.isEmpty())
+        }
+    }
+
+    @Test
+    fun `focus region crop and mapping`() {
+        val crop = FocusRegion.centerSquare(1080, 1920, 0.8f)
+        assertEquals(CropRect(108, 528, 864, 864), crop)
+        val full = FocusRegion.toFrame(BoundingBox(0f, 0f, 1f, 1f), crop, 1080, 1920)
+        assertEquals(0.1f, full.left, 1e-4f)
+        assertEquals(0.9f, full.right, 1e-4f)
+        assertEquals(528f / 1920, full.top, 1e-4f)
+        assertEquals(FocusRegion.normalized(crop, 1080, 1920), full)
     }
 
     @Test

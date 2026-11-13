@@ -3,22 +3,26 @@ package com.pokervision.core.domain.vision
 import com.pokervision.core.model.card.PlayingCard
 
 /**
- * Temporal confirmation: a card counts only when it was detected (score >= [minScore]) in at least
- * [requiredHits] of the last [window] analysed frames. Single-frame false positives — the model's
- * precision is far from perfect — therefore never reach the poker calculation.
+ * Temporal confirmation: a card counts only when it has collected [requiredWeight] evidence over the
+ * last [window] analysed frames (score >= [minScore]). A frame where **both corners** of the card
+ * were read as the same card weighs 2, a single corner weighs 1 — so a card whose two corners
+ * disagree (e.g. one read as an ace, the other as a four) needs more frames before it is trusted.
+ * Single-frame false positives never reach the poker calculation.
  */
 class CardConfirmer(
     private val window: Int = DEFAULT_WINDOW,
-    private val requiredHits: Int = DEFAULT_REQUIRED_HITS,
+    private val requiredWeight: Int = DEFAULT_REQUIRED_WEIGHT,
     private val minScore: Float = DEFAULT_MIN_SCORE,
 ) {
     init {
         require(window >= 1) { "window must be >= 1" }
-        require(requiredHits in 1..window) { "requiredHits must be in 1..window" }
+        require(requiredWeight in 1..2 * window) { "requiredWeight must be in 1..2*window" }
         require(minScore in 0f..1f) { "minScore must be in [0,1]" }
     }
 
-    private val history = ArrayDeque<Map<PlayingCard, Float>>()
+    private class Hit(val score: Float, val weight: Int)
+
+    private val history = ArrayDeque<Map<PlayingCard, Hit>>()
 
     data class State(
         /** Cards seen consistently, with their mean score over the frames they appeared in. */
@@ -28,14 +32,18 @@ class CardConfirmer(
     )
 
     fun update(sightings: List<CardSighting>): State {
-        history.addLast(sightings.filter { it.score >= minScore }.associate { it.card to it.score })
+        history.addLast(
+            sightings.filter { it.score >= minScore }
+                .associate { it.card to Hit(it.score, if (it.pipCount >= 2) 2 else 1) },
+        )
         while (history.size > window) history.removeFirst()
-        val hits = HashMap<PlayingCard, MutableList<Float>>()
-        history.forEach { frame -> frame.forEach { (card, score) -> hits.getOrPut(card) { mutableListOf() } += score } }
+        val hits = HashMap<PlayingCard, MutableList<Hit>>()
+        history.forEach { frame -> frame.forEach { (card, hit) -> hits.getOrPut(card) { mutableListOf() } += hit } }
         val confirmed = HashMap<PlayingCard, Float>()
         val tentative = HashMap<PlayingCard, Float>()
-        hits.forEach { (card, scores) ->
-            (if (scores.size >= requiredHits) confirmed else tentative)[card] = scores.average().toFloat()
+        hits.forEach { (card, list) ->
+            val mean = list.map { it.score }.average().toFloat()
+            (if (list.sumOf { it.weight } >= requiredWeight) confirmed else tentative)[card] = mean
         }
         return State(confirmed, tentative)
     }
@@ -43,9 +51,11 @@ class CardConfirmer(
     fun reset() = history.clear()
 
     companion object {
-        /** At ~3-5 analysed frames per second this is about 1.5-2 seconds of evidence. */
-        const val DEFAULT_WINDOW = 6
-        const val DEFAULT_REQUIRED_HITS = 3
+        /** At ~2-4 analysed frames per second this is about 2-4 seconds of evidence. */
+        const val DEFAULT_WINDOW = 8
+
+        /** E.g. two frames with both corners agreeing, or four frames with one clear corner. */
+        const val DEFAULT_REQUIRED_WEIGHT = 4
         const val DEFAULT_MIN_SCORE = 0.5f
     }
 }

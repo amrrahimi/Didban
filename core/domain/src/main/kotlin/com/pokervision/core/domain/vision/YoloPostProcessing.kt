@@ -133,3 +133,42 @@ object CardLabels {
     val DEFAULT_ORDER: List<String> = listOf("10", "2", "3", "4", "5", "6", "7", "8", "9", "A", "J", "K", "Q")
         .flatMap { r -> listOf("C", "D", "H", "S").map { s -> r + s } }
 }
+
+/** Pixel rectangle inside a frame. */
+data class CropRect(val left: Int, val top: Int, val width: Int, val height: Int) {
+    init {
+        require(left >= 0 && top >= 0 && width > 0 && height > 0) { "Invalid crop $this" }
+    }
+}
+
+/**
+ * The "card area": a centred square that is sent to the model at close to full camera resolution
+ * instead of shrinking the whole frame. Corner symbols become about twice as large for the model,
+ * which is what separates look-alike ranks such as A and 4.
+ */
+object FocusRegion {
+
+    fun centerSquare(frameWidth: Int, frameHeight: Int, fraction: Float = DEFAULT_FRACTION): CropRect {
+        require(frameWidth > 0 && frameHeight > 0) { "Frame size must be positive" }
+        require(fraction > 0f && fraction <= 1f) { "fraction must be in (0,1]" }
+        val side = (min(frameWidth, frameHeight) * fraction).roundToInt().coerceAtLeast(1)
+        return CropRect((frameWidth - side) / 2, (frameHeight - side) / 2, side, side)
+    }
+
+    /** Converts a box normalized to the crop into a box normalized to the full frame. */
+    fun toFrame(box: BoundingBox, crop: CropRect, frameWidth: Int, frameHeight: Int): BoundingBox {
+        fun x(v: Float) = ((crop.left + v * crop.width) / frameWidth).coerceIn(0f, 1f)
+        fun y(v: Float) = ((crop.top + v * crop.height) / frameHeight).coerceIn(0f, 1f)
+        return BoundingBox(x(box.left), y(box.top), x(box.right), y(box.bottom))
+    }
+
+    /** Crop rectangle normalized to the frame, for drawing the card area on screen. */
+    fun normalized(crop: CropRect, frameWidth: Int, frameHeight: Int) = BoundingBox(
+        crop.left.toFloat() / frameWidth,
+        crop.top.toFloat() / frameHeight,
+        (crop.left + crop.width).toFloat() / frameWidth,
+        (crop.top + crop.height).toFloat() / frameHeight,
+    )
+
+    const val DEFAULT_FRACTION = 0.8f
+}

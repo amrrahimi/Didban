@@ -48,6 +48,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -72,6 +73,7 @@ import com.pokervision.core.domain.usecase.LiveAnalysis
 import com.pokervision.core.domain.vision.LiveHand
 import com.pokervision.core.domain.vision.LivePhase
 import com.pokervision.core.model.card.PlayingCard
+import com.pokervision.core.model.detection.BoundingBox
 import com.pokervision.core.model.card.Rank
 import com.pokervision.core.model.card.Suit
 import com.pokervision.core.poker.advice.LiveAction
@@ -138,11 +140,19 @@ private fun LiveContent(viewModel: LiveViewModel) {
                     PreviewView(ctx).apply {
                         scaleType = PreviewView.ScaleType.FILL_CENTER
                         implementationMode = PreviewView.ImplementationMode.COMPATIBLE
+                        // Tap to focus: cards held close to the lens are often blurry otherwise.
+                        setOnTouchListener { view, event ->
+                            if (event.action == android.view.MotionEvent.ACTION_UP) {
+                                controller.focusAt(this, event.x, event.y)
+                                view.performClick()
+                            }
+                            true
+                        }
                     }.also { previewView = it }
                 },
                 modifier = Modifier.fillMaxSize(),
             )
-            DetectionOverlay(vision.overlay)
+            DetectionOverlay(vision.overlay, vision.focusArea, stringResource(R.string.live_focus_hint))
         }
 
         Column(Modifier.align(Alignment.TopCenter).fillMaxWidth()) {
@@ -163,9 +173,27 @@ private fun LiveContent(viewModel: LiveViewModel) {
 
 @OptIn(ExperimentalTextApi::class)
 @Composable
-private fun DetectionOverlay(boxes: List<OverlayBox>) {
+private fun DetectionOverlay(boxes: List<OverlayBox>, focusArea: BoundingBox?, focusHint: String) {
     val measurer = rememberTextMeasurer()
     Canvas(Modifier.fillMaxSize()) {
+        focusArea?.let { a ->
+            val tl = Offset(a.left * size.width, a.top * size.height)
+            drawRect(
+                color = Color.White.copy(alpha = 0.8f),
+                topLeft = tl,
+                size = Size(a.width * size.width, a.height * size.height),
+                style = Stroke(
+                    width = 2.dp.toPx(),
+                    pathEffect = PathEffect.dashPathEffect(floatArrayOf(12.dp.toPx(), 8.dp.toPx())),
+                ),
+            )
+            drawText(
+                textMeasurer = measurer,
+                text = focusHint,
+                topLeft = Offset(tl.x + 6.dp.toPx(), tl.y + 6.dp.toPx()),
+                style = TextStyle(color = Color.White, fontSize = 12.sp, background = Color.Black.copy(alpha = 0.5f)),
+            )
+        }
         boxes.forEach { b ->
             val color = if (b.confirmed) PokerColors.ConfidenceHigh else PokerColors.ConfidenceMedium
             val topLeft = Offset(b.box.left * size.width, b.box.top * size.height)
