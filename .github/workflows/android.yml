@@ -26,6 +26,22 @@ jobs:
 
       - uses: gradle/actions/setup-gradle@v4
 
+      - name: Fetch card detection model
+        run: ./scripts/fetch_card_model.sh
+
+      - name: Inspect card model (input/output format)
+        run: |
+          pip install --quiet onnx
+          python - <<'PY'
+          import onnx, json
+          m = onnx.load("core/vision/src/main/assets/models/card_detector.onnx")
+          for i in m.graph.input: print("INPUT", i.name, [d.dim_value or d.dim_param for d in i.type.tensor_type.shape.dim])
+          for o in m.graph.output: print("OUTPUT", o.name, [d.dim_value or d.dim_param for d in o.type.tensor_type.shape.dim])
+          print("OPSET", [(o.domain, o.version) for o in m.opset_import])
+          for p in m.metadata_props: print("META", p.key, "=", p.value[:500])
+          print("CLASSES", open("core/vision/src/main/assets/models/card_detector.classes.json").read()[:2000])
+          PY
+
       - name: Unit tests (all modules)
         run: ./gradlew test --stacktrace --continue
 
@@ -81,6 +97,9 @@ jobs:
           java-version: "17"
 
       - uses: gradle/actions/setup-gradle@v4
+
+      - name: Fetch card detection model
+        run: ./scripts/fetch_card_model.sh
 
       - name: Enable KVM
         run: |
