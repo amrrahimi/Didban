@@ -6,6 +6,16 @@ import org.junit.Test
 
 class ImageGeometryTest {
 
+    private fun sig(value: Int, size: Int = 4) = LumaSignature(size, IntArray(size * size) { value })
+
+    @Test
+    fun `signature distance`() {
+        assertEquals(0.0, sig(100).distanceTo(sig(100)), 0.0)
+        assertEquals(30.0, sig(100).distanceTo(sig(130)), 1e-9)
+        val half = LumaSignature(2, intArrayOf(0, 0, 255, 255))
+        assertEquals(127.5, half.distanceTo(sig(0, 2)), 1e-9)
+    }
+
     @Test
     fun `fit within keeps aspect and never upscales`() {
         assertEquals(PixelSize(1280, 720), ResizeMath.fitWithin(PixelSize(1920, 1080), 1280, 1280))

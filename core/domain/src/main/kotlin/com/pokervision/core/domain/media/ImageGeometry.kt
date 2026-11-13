@@ -1,7 +1,26 @@
 package com.pokervision.core.domain.media
 
+import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.roundToInt
+
+/**
+ * Compact grayscale fingerprint of an image: [size]×[size] luminance values (0..255). Comparing
+ * fingerprints is cheap; live analysis will use it to notice when the table changes.
+ */
+class LumaSignature(val size: Int, val values: IntArray) {
+    init {
+        require(size > 0 && values.size == size * size) { "values must have size*size entries" }
+    }
+
+    /** Mean absolute difference per pixel, 0 (identical) .. 255 (inverted). */
+    fun distanceTo(other: LumaSignature): Double {
+        require(other.size == size) { "Signature sizes differ" }
+        var sum = 0L
+        for (i in values.indices) sum += abs(values[i] - other.values[i])
+        return sum.toDouble() / values.size
+    }
+}
 
 data class PixelSize(val width: Int, val height: Int) {
     init {
