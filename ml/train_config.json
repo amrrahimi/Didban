@@ -3,5 +3,6 @@
   "data": "standin",
   "epochs": 3,
   "imgsz": 640,
-  "composites": 300
+  "composites": 300,
+  "run": 2
 }

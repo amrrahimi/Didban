@@ -6,6 +6,7 @@ Not used to train the shipped model.
 import argparse
 import io
 import json
+import os
 import random
 import time
 import urllib.request
@@ -41,6 +42,7 @@ def main():
     names = next(f["type"]["names"] for f in first["features"] if f["name"] == "label")
     total = first["num_rows_total"]
     counts = {}
+    os.makedirs(os.path.dirname(args.out) or ".", exist_ok=True)
     with zipfile.ZipFile(args.out, "w") as z:
         z.writestr("manifest.json", json.dumps({"format": "pokervision-card-capture-v1", "source": DATASET}))
         offsets = list(range(0, total, 100))
