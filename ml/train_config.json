@@ -1,0 +1,7 @@
+{
+  "comment": "Editing this file starts a training run in GitHub Actions. data = path to a 'Learn my cards' zip in the repo, or 'standin' for public photos (pipeline test only).",
+  "data": "standin",
+  "epochs": 3,
+  "imgsz": 640,
+  "composites": 300
+}

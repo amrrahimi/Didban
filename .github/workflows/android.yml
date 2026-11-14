@@ -3,6 +3,9 @@ name: Poker Vision AI - Android build
 on:
   push:
     branches: [poker-vision]
+    paths-ignore:
+      - "ml/**"
+      - ".github/workflows/train-card-model.yml"
   workflow_dispatch:
 
 concurrency:
