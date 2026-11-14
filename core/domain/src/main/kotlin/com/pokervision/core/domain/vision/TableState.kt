@@ -41,6 +41,8 @@ object TableRules {
     /** Stud shows opponents' up-cards; Draw has nothing on the table to scan. */
     fun tableScanAvailable(v: PokerVariant): Boolean = v != PokerVariant.FIVE_CARD_DRAW
 
+    fun tableScanAvailableFor(state: TableState): Boolean = tableScanAvailable(state.variant)
+
     fun maxOpponents(v: PokerVariant): Int = PokerEngines.forVariant(v).maxOpponents
 
     /**

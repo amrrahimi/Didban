@@ -70,4 +70,15 @@
     <string name="scan_issue_opponents">Too many opponents for the cards left. Lower the number of opponents.</string>
     <string name="scan_draw_advice">Keep: %1$s · draw %2$d new</string>
     <string name="scan_hilo_note">Hi-Lo: the chance includes winning half the pot with the low hand.</string>
+    <string name="monitor_title">Monitor mode</string>
+    <string name="monitor_intro">Put the phone on a stand in front of the computer so the camera sees the game. The camera is needed for this.</string>
+    <string name="monitor_draw_mine">Drag a box around YOUR cards on the picture</string>
+    <string name="monitor_draw_board">Drag a box around the BOARD cards on the picture</string>
+    <string name="monitor_mine">My cards</string>
+    <string name="monitor_upcards">Up-cards</string>
+    <string name="monitor_set_mine">My cards area</string>
+    <string name="monitor_set_board">Board area</string>
+    <string name="monitor_reset_areas">Reset areas</string>
+    <string name="monitor_speed">One reading every %1$s s</string>
+    <string name="monitor_tips">Tips: keep the phone still on a stand, fill the picture with the game window, turn the screen brightness down a little if the picture shines, and avoid lamps reflecting on the monitor. Mark the two areas once; they are remembered.</string>
 </resources>

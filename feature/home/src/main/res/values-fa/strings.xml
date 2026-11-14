@@ -7,6 +7,8 @@
     <string name="home_stat_hands">دست</string>
     <string name="home_badge_phase">فاز %1$d</string>
 
+    <string name="home_tile_monitor">حالت مانیتور</string>
+    <string name="home_tile_monitor_sub">گوشی روی پایه، بازی را از صفحهٔ کامپیوتر می‌خواند</string>
     <string name="home_tile_live">میز زنده</string>
     <string name="home_tile_live_sub">دوربین را رو به کارت‌ها بگیرید: خواندن خودکار و پیشنهاد</string>
     <string name="home_tile_learn">یادگیری کارت‌های من</string>

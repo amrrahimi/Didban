@@ -17,6 +17,7 @@ import com.pokervision.feature.imageanalysis.IMAGE_ID_ARG
 import com.pokervision.feature.imageanalysis.ImageDetailRoute
 import com.pokervision.feature.imageanalysis.ImageListRoute
 import com.pokervision.feature.live.LiveRoute
+import com.pokervision.feature.live.MonitorRoute
 import com.pokervision.feature.live.learn.LearnDeckRoute
 import com.pokervision.feature.settings.DetectionSettingsRoute
 import com.pokervision.feature.settings.PrivacySettingsRoute
@@ -50,6 +51,7 @@ fun PokerVisionNavHost(navController: NavHostController = rememberNavController(
         }
         composable(Routes.ADVISOR) { AdvisorRoute(onBack = back) }
         composable(Routes.LIVE) { LiveRoute(onBack = back) }
+        composable(Routes.MONITOR) { MonitorRoute(onBack = back) }
         composable(Routes.LEARN) { LearnDeckRoute(onBack = back) }
         composable(Routes.STATISTICS) { StatisticsPlaceholderScreen(onBack = back) }
         composable(Routes.VARIANT) { VariantSelectionRoute(onBack = back) }

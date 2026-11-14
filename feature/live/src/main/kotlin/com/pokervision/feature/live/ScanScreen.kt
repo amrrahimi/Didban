@@ -134,7 +134,7 @@ fun LiveRoute(onBack: () -> Unit, viewModel: ScanViewModel = hiltViewModel()) {
 }
 
 @Composable
-private fun VariantMenu(current: PokerVariant, onSelect: (PokerVariant) -> Unit) {
+internal fun VariantMenu(current: PokerVariant, onSelect: (PokerVariant) -> Unit) {
     var open by remember { mutableStateOf(false) }
     Box {
         TextButton(onClick = { open = true }) { Text(current.label() + " ▾") }
@@ -417,7 +417,7 @@ private fun CardPickerDialog(variant: PokerVariant, used: Set<PlayingCard>, onPi
 }
 
 @Composable
-private fun AdvicePanel(table: TableState, state: AnalysisState) {
+internal fun AdvicePanel(table: TableState, state: AnalysisState) {
     Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
         when (state) {
             AnalysisState.Computing -> Text(stringResource(R.string.scan_computing), color = Color.White)

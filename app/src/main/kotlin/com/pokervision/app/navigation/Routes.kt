@@ -9,6 +9,7 @@ object Routes {
     const val IMAGES = "images"
     const val ADVISOR = "advisor"
     const val LIVE = "live"
+    const val MONITOR = "monitor"
     const val LEARN = "learn"
     const val HISTORY = "history"
     const val STATISTICS = "statistics"
@@ -26,6 +27,7 @@ object Routes {
         HomeEntry.IMAGE_ANALYSIS -> IMAGES
         HomeEntry.ADVISOR -> ADVISOR
         HomeEntry.LIVE_TABLE -> LIVE
+        HomeEntry.MONITOR_MODE -> MONITOR
         HomeEntry.LEARN_CARDS -> LEARN
         HomeEntry.HISTORY -> HISTORY
         HomeEntry.STATISTICS -> STATISTICS

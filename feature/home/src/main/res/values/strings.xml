@@ -7,6 +7,8 @@
     <string name="home_stat_hands">Hands</string>
     <string name="home_badge_phase">Phase %1$d</string>
 
+    <string name="home_tile_monitor">Monitor mode</string>
+    <string name="home_tile_monitor_sub">Phone on a stand reads the game on your computer screen</string>
     <string name="home_tile_live">Live Table</string>
     <string name="home_tile_live_sub">Point the camera at the cards: automatic reading and advice</string>
     <string name="home_tile_learn">Learn my cards</string>

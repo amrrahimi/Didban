@@ -70,4 +70,15 @@
     <string name="scan_issue_opponents">برای کارت‌های باقی‌مانده حریف زیادی انتخاب شده. تعداد حریف را کم کنید.</string>
     <string name="scan_draw_advice">نگه دارید: %1$s · %2$d کارت جدید بگیرید</string>
     <string name="scan_hilo_note">های-لو: این شانس شامل بردن نصف پات با دست پایین هم هست.</string>
+    <string name="monitor_title">حالت مانیتور</string>
+    <string name="monitor_intro">گوشی را روی یک پایه جلوی کامپیوتر بگذارید تا دوربین بازی را ببیند. برای این کار به دوربین نیاز است.</string>
+    <string name="monitor_draw_mine">روی تصویر دور کارت‌های خودتان یک کادر بکشید</string>
+    <string name="monitor_draw_board">روی تصویر دور کارت‌های زمین یک کادر بکشید</string>
+    <string name="monitor_mine">کارت‌های من</string>
+    <string name="monitor_upcards">کارت‌های رو</string>
+    <string name="monitor_set_mine">محدودهٔ کارت‌های من</string>
+    <string name="monitor_set_board">محدودهٔ زمین</string>
+    <string name="monitor_reset_areas">بازنشانی محدوده‌ها</string>
+    <string name="monitor_speed">هر %1$s ثانیه یک بار خوانده می‌شود</string>
+    <string name="monitor_tips">نکته‌ها: گوشی را روی پایه ثابت نگه دارید، پنجرهٔ بازی کل تصویر را پر کند، اگر تصویر برق می‌زند نور مانیتور را کمی کم کنید، و نور لامپ روی مانیتور منعکس نشود. دو محدوده را فقط یک بار مشخص کنید؛ برنامه آن‌ها را به خاطر می‌سپارد.</string>
 </resources>
