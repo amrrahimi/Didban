@@ -29,7 +29,8 @@ jobs:
 
       - name: Install
         run: |
-          pip install --quiet --extra-index-url https://download.pytorch.org/whl/cpu torch torchvision
+          # Pinned to the PyTorch generation ultralytics 8.3.40 was released with (classic ONNX exporter).
+          pip install --quiet --index-url https://download.pytorch.org/whl/cpu torch==2.5.1 torchvision==0.20.1
           pip install --quiet -r ml/requirements.txt
 
       - name: Read config

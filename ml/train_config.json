@@ -4,5 +4,5 @@
   "epochs": 3,
   "imgsz": 640,
   "composites": 300,
-  "run": 2
+  "run": 3
 }
