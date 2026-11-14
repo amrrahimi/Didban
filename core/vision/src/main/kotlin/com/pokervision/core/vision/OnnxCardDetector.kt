@@ -12,8 +12,11 @@ import android.graphics.Paint
 import android.graphics.Rect
 import com.pokervision.core.domain.vision.CardLabels
 import com.pokervision.core.domain.vision.CardSighting
+import com.pokervision.core.domain.vision.FocusRegion
 import com.pokervision.core.domain.vision.Letterbox
 import com.pokervision.core.domain.vision.PipClusterer
+import com.pokervision.core.domain.vision.PipDetection
+import com.pokervision.core.domain.vision.TilePlan
 import com.pokervision.core.domain.vision.YoloDecoder
 import com.pokervision.core.model.card.PlayingCard
 import com.pokervision.core.model.detection.ModelInfo
@@ -44,6 +47,12 @@ interface CardDetector {
 
     /** Detects cards in an upright image. Blocking (tens to hundreds of ms); call off the main thread. */
     fun detect(image: Bitmap, scoreThreshold: Float): FrameDetections
+
+    /**
+     * Reads a full-resolution photo: the whole image plus overlapping tiles ([TilePlan]), so corner
+     * symbols keep enough pixels. Boxes are normalized to [photo]. Blocking (a few seconds at most).
+     */
+    fun scanPhoto(photo: Bitmap, scoreThreshold: Float): FrameDetections
 }
 
 /**
@@ -110,10 +119,43 @@ class OnnxCardDetector @Inject constructor(
         return CardLabels.parse(codes)
     }
 
+    // Synchronized: the input buffers below are reused between calls.
+    @Synchronized
     override fun detect(image: Bitmap, scoreThreshold: Float): FrameDetections {
         prepare()
-        val s = session ?: return FrameDetections(emptyList(), 0)
+        if (session == null) return FrameDetections(emptyList(), 0)
         val start = System.nanoTime()
+        val sightings = PipClusterer.cluster(detectPips(image, scoreThreshold), labels)
+        return FrameDetections(sightings, (System.nanoTime() - start) / 1_000_000)
+    }
+
+    @Synchronized
+    override fun scanPhoto(photo: Bitmap, scoreThreshold: Float): FrameDetections {
+        prepare()
+        if (session == null) return FrameDetections(emptyList(), 0)
+        val start = System.nanoTime()
+        val pips = ArrayList(detectPips(photo, scoreThreshold))
+        val tiles = TilePlan.tiles(photo.width, photo.height)
+        if (tiles.size > 1) {
+            for (t in tiles) {
+                val tile = Bitmap.createBitmap(photo, t.left, t.top, t.width, t.height)
+                try {
+                    detectPips(tile, scoreThreshold).mapTo(pips) {
+                        it.copy(box = FocusRegion.toFrame(it.box, t, photo.width, photo.height))
+                    }
+                } finally {
+                    if (tile !== photo) tile.recycle()
+                }
+            }
+        }
+        // The same symbol is usually found by the full-image pass and one or two tiles.
+        val merged = YoloDecoder.nms(pips, YoloDecoder.DEFAULT_IOU_THRESHOLD)
+        return FrameDetections(PipClusterer.cluster(merged, labels), (System.nanoTime() - start) / 1_000_000)
+    }
+
+    /** Runs the model once on [image] (letterboxed to 640) and returns pips normalized to [image]. */
+    private fun detectPips(image: Bitmap, scoreThreshold: Float): List<PipDetection> {
+        val s = session ?: return emptyList()
         val letterbox = Letterbox(image.width, image.height, INPUT_SIZE)
         canvas.drawColor(Color.rgb(PAD_GRAY, PAD_GRAY, PAD_GRAY))
         canvas.drawBitmap(
@@ -133,7 +175,7 @@ class OnnxCardDetector @Inject constructor(
             arr[2 * plane + i] = (p and 0xFF) / 255f
         }
         val shape = longArrayOf(1, 3, INPUT_SIZE.toLong(), INPUT_SIZE.toLong())
-        val pips = OnnxTensor.createTensor(env, chw, shape).use { tensor ->
+        return OnnxTensor.createTensor(env, chw, shape).use { tensor ->
             s.run(mapOf(s.inputNames.first() to tensor)).use { result ->
                 val out = (result[0] as OnnxTensor).floatBuffer
                 val flat = FloatArray(out.remaining()).also { out.get(it) }
@@ -141,8 +183,6 @@ class OnnxCardDetector @Inject constructor(
                 YoloDecoder.decode(flat, numClasses, flat.size / (4 + numClasses), scoreThreshold, letterbox)
             }
         }
-        val sightings = PipClusterer.cluster(pips, labels)
-        return FrameDetections(sightings, (System.nanoTime() - start) / 1_000_000)
     }
 
     companion object {

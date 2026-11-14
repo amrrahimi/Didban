@@ -1,8 +1,8 @@
 package com.pokervision.feature.advisor
 
 import com.pokervision.core.model.card.PlayingCard
+import com.pokervision.core.model.game.PokerVariant
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Test
 
@@ -35,12 +35,37 @@ class AdvisorInputReducerTest {
     }
 
     @Test
-    fun `missing input states`() {
-        assertEquals(MissingInput.HERO_CARDS, AdvisorInputReducer.missing(AdvisorInput()))
+    fun `query carries the input for analysis`() {
         val hero = tap(AdvisorInput(), "As", "Kd")
-        assertNull(AdvisorInputReducer.missing(hero))
-        assertEquals(MissingInput.BOARD_INCOMPLETE, AdvisorInputReducer.missing(tap(hero, "2c")))
-        assertNotNull(AdvisorInputReducer.toSituation(hero))
+        val q = AdvisorInputReducer.toQuery(hero)
+        assertEquals(listOf(c("As"), c("Kd")), q.mine)
+        assertEquals(PokerVariant.TEXAS_HOLDEM, q.variant)
+    }
+
+    @Test
+    fun `omaha takes four hole cards before moving to the board`() {
+        val omaha = AdvisorInputReducer.setVariant(AdvisorInput(), PokerVariant.OMAHA)
+        val three = tap(omaha, "As", "Kd", "Qh")
+        assertEquals(CardTarget.HERO, three.target)
+        val four = tap(three, "Jc")
+        assertEquals(4, four.hero.size)
+        assertEquals(CardTarget.BOARD, four.target)
+    }
+
+    @Test
+    fun `short deck rejects low cards`() {
+        val sd = AdvisorInputReducer.setVariant(AdvisorInput(), PokerVariant.SHORT_DECK)
+        assertEquals(emptyList<PlayingCard>(), tap(sd, "5h").hero)
+        assertEquals(listOf(c("6h")), tap(sd, "6h").hero)
+    }
+
+    @Test
+    fun `stud and draw have no board`() {
+        val stud = AdvisorInputReducer.setVariant(AdvisorInput(), PokerVariant.SEVEN_CARD_STUD)
+        assertEquals(0, stud.capacity(CardTarget.BOARD))
+        assertEquals(7, stud.capacity(CardTarget.HERO))
+        val draw = AdvisorInputReducer.setVariant(AdvisorInput(), PokerVariant.FIVE_CARD_DRAW)
+        assertEquals(5, draw.capacity(CardTarget.HERO))
     }
 
     @Test
@@ -65,7 +90,7 @@ class AdvisorInputReducerTest {
 
     @Test
     fun `opponents are clamped`() {
-        assertEquals(MAX_OPPONENTS, AdvisorInputReducer.setOpponents(AdvisorInput(), 20).opponents)
+        assertEquals(AdvisorInput().maxOpponents, AdvisorInputReducer.setOpponents(AdvisorInput(), 20).opponents)
         assertEquals(MIN_OPPONENTS, AdvisorInputReducer.setOpponents(AdvisorInput(), 0).opponents)
     }
 }

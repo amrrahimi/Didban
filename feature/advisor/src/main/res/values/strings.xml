@@ -2,9 +2,7 @@
 <resources>
     <string name="advisor_title">Live Advisor</string>
     <string name="advisor_new_hand">New hand</string>
-    <string name="advisor_variant_not_supported">Your selected game is %1$s. The advisor currently calculates Texas Hold\'em only; the other variants are being added.</string>
 
-    <string name="advisor_need_hero">Tap your two cards below.</string>
     <string name="advisor_need_board">The board needs 3 cards (flop), 4 (turn) or 5 (river).</string>
     <string name="advisor_too_many_cards">Too many cards are marked for this many opponents.</string>
 
@@ -52,4 +50,9 @@
     <string name="hand_full_house">Full house</string>
     <string name="hand_quads">Four of a kind</string>
     <string name="hand_straight_flush">Straight flush</string>
+    <string name="advisor_need_hero_n">Tap your %1$d cards below.</string>
+    <string name="advisor_need_hero_range">Tap your cards below (%1$d to %2$d).</string>
+    <string name="advisor_card_not_in_deck">This game is played without 2s to 5s; remove those cards.</string>
+    <string name="advisor_draw_done">I have drawn</string>
+    <string name="advisor_draw_advice">Keep: %1$s · draw %2$d new</string>
 </resources>

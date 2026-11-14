@@ -54,6 +54,16 @@ The product goal is a **live advisor for learning and friendly games where all p
 
 **Measured so far (honest):** on 16 small (224×224) public card photos the model found 2 cards, both correct; one wrong guess (score 0.41) stayed below the confirmation threshold. These photos are far smaller than live camera frames, so real-table accuracy is still unknown. The model's publisher reports ~85% recall on real table video. Inference: ~350–450 ms per frame on the CI emulator.
 
+## v0.6 — Photo scan + all six variants
+
+| Item | Status | Verification |
+|---|---|---|
+| Live Table now scans a **single full-resolution photo** (like a camera translator) instead of reading a shaky video stream; whole photo + overlapping tiles so corner symbols keep their pixels | 🟡 | `TilePlan` tests; real-phone check pending |
+| Single-photo acceptance: both corners agreeing, or one very clear corner; everything else waits for one tap | ✅ | `ScanAndTableTest` |
+| Engines: Hold'em (exact heads-up turn/river), Omaha (exactly 2+3), Omaha Hi-Lo (8-or-better low, split pots), Short Deck (36 cards, flush > full house, A-6-7-8-9 straight, configurable trips vs straight), Seven Card Stud (3–7 own cards, up-cards as dead cards), Five Card Draw (best cards to keep; simulated opponents draw by a standard rule) | ✅ | `VariantEnginesTest`, `AnalyzeHandTest` |
+| Manual advisor and Live Table for every variant (variant switch on screen) | 🟡 | `AdvisorInputReducerTest`; manual check pending |
+| Learn my cards: guided capture + export of the user's deck photos | 🟡 | waiting for the user's photos to train a deck-specific model |
+
 ## Next
 
 | Step | Scope |

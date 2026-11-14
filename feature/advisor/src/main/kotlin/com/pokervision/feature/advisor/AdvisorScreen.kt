@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -25,7 +26,10 @@ import androidx.compose.material.icons.outlined.Remove
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
@@ -35,6 +39,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -56,8 +61,10 @@ import com.pokervision.core.model.card.Suit
 import com.pokervision.core.model.game.PokerVariant
 import com.pokervision.core.poker.advice.AdviceAction
 import com.pokervision.core.poker.advice.AdviceReason
+import com.pokervision.core.domain.usecase.HandAnalysis
+import com.pokervision.core.poker.engine.EngineIssue
+import com.pokervision.core.poker.engine.PokerEngines
 import com.pokervision.core.poker.holdem.HandCategory
-import com.pokervision.core.ui.component.PlannedFeatureNotice
 import com.pokervision.core.ui.component.PlayingCardView
 import com.pokervision.core.ui.component.PokerTopBar
 import com.pokervision.core.ui.text.label
@@ -68,7 +75,6 @@ import java.util.Locale
 fun AdvisorRoute(onBack: () -> Unit, viewModel: AdvisorViewModel = hiltViewModel()) {
     val input by viewModel.input.collectAsStateWithLifecycle()
     val result by viewModel.result.collectAsStateWithLifecycle()
-    val variant by viewModel.selectedVariant.collectAsStateWithLifecycle()
 
     Scaffold(
         topBar = {
@@ -76,6 +82,7 @@ fun AdvisorRoute(onBack: () -> Unit, viewModel: AdvisorViewModel = hiltViewModel
                 title = stringResource(R.string.advisor_title),
                 onBack = onBack,
                 actions = {
+                    VariantMenu(input.variant, viewModel::setVariant)
                     IconButton(onClick = viewModel::newHand) {
                         Icon(Icons.Outlined.Refresh, contentDescription = stringResource(R.string.advisor_new_hand))
                     }
@@ -88,13 +95,14 @@ fun AdvisorRoute(onBack: () -> Unit, viewModel: AdvisorViewModel = hiltViewModel
             Modifier.padding(padding).fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 12.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
-            if (variant != PokerVariant.TEXAS_HOLDEM) {
-                PlannedFeatureNotice(
-                    phase = 9,
-                    description = stringResource(R.string.advisor_variant_not_supported, variant.label()),
+            ResultCard(result, input)
+            if (input.variant == PokerVariant.FIVE_CARD_DRAW) {
+                FilterChip(
+                    selected = input.drawDone,
+                    onClick = { viewModel.setDrawDone(!input.drawDone) },
+                    label = { Text(stringResource(R.string.advisor_draw_done)) },
                 )
             }
-            ResultCard(result, input.opponents)
             SelectedCards(input, onSelectTarget = viewModel::selectTarget, onRemove = viewModel::tapCard)
             CardPicker(input, onTap = viewModel::tapCard)
             TableInputs(
@@ -116,31 +124,61 @@ fun AdvisorRoute(onBack: () -> Unit, viewModel: AdvisorViewModel = hiltViewModel
 // ---------------------------------------------------------------- Result
 
 @Composable
-private fun ResultCard(result: AdvisorResult?, opponents: Int) {
-    Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)) {
-        Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-            when (result) {
-                null -> LinearProgressIndicator(Modifier.fillMaxWidth())
-                is AdvisorResult.NeedsInput -> Text(
-                    stringResource(
-                        when (result.missing) {
-                            MissingInput.HERO_CARDS -> R.string.advisor_need_hero
-                            MissingInput.BOARD_INCOMPLETE -> R.string.advisor_need_board
-                            MissingInput.TOO_MANY_CARDS -> R.string.advisor_too_many_cards
-                        },
-                    ),
-                    style = MaterialTheme.typography.titleMedium,
+private fun VariantMenu(current: PokerVariant, onSelect: (PokerVariant) -> Unit) {
+    var open by remember { mutableStateOf(false) }
+    Box {
+        TextButton(onClick = { open = true }) { Text(current.label() + " ▾") }
+        DropdownMenu(expanded = open, onDismissRequest = { open = false }) {
+            PokerVariant.entries.forEach { v ->
+                DropdownMenuItem(
+                    text = { Text((if (v == current) "✓ " else "") + v.label()) },
+                    onClick = {
+                        open = false
+                        onSelect(v)
+                    },
                 )
-                is AdvisorResult.Ready -> ReadyResult(result, opponents)
             }
         }
     }
 }
 
 @Composable
-private fun ReadyResult(result: AdvisorResult.Ready, opponents: Int) {
-    val a = result.analysis
-    val advice = a.advice
+private fun ResultCard(result: AdvisorResult?, input: AdvisorInput) {
+    Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)) {
+        Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+            when (result) {
+                null -> LinearProgressIndicator(Modifier.fillMaxWidth())
+                is AdvisorResult.NeedsInput -> Text(needText(result.issue, input), style = MaterialTheme.typography.titleMedium)
+                is AdvisorResult.Ready -> ReadyResult(result.analysis, input.opponents)
+            }
+        }
+    }
+}
+
+@Composable
+private fun needText(issue: EngineIssue, input: AdvisorInput): String = when (issue) {
+    EngineIssue.HERO_CARD_COUNT -> {
+        val range = PokerEngines.forVariant(input.variant).heroCards
+        if (range.first == range.last) stringResource(R.string.advisor_need_hero_n, range.first)
+        else stringResource(R.string.advisor_need_hero_range, range.first, range.last)
+    }
+    EngineIssue.BOARD_SIZE -> stringResource(R.string.advisor_need_board)
+    EngineIssue.CARD_NOT_IN_DECK -> stringResource(R.string.advisor_card_not_in_deck)
+    EngineIssue.DUPLICATE_CARD, EngineIssue.TOO_MANY_OPPONENTS, EngineIssue.NOT_ENOUGH_CARDS ->
+        stringResource(R.string.advisor_too_many_cards)
+}
+
+@Composable
+private fun ReadyResult(a: HandAnalysis, opponents: Int) {
+    val advice = a.potAdvice
+    a.draw?.let { d ->
+        val keep = if (d.keep.isEmpty()) "—" else d.keep.joinToString(" ") { "${it.rank.symbol}${it.suit.glyph}" }
+        Text(
+            stringResource(R.string.advisor_draw_advice, keep, d.discard.size),
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.Bold,
+        )
+    }
     val hero = a.equity.players.first()
     val (actionColor, actionText) = when (advice.action) {
         AdviceAction.FOLD -> PokerColors.ConfidenceLow to stringResource(R.string.advisor_action_fold)
@@ -194,7 +232,7 @@ private fun ReadyResult(result: AdvisorResult.Ready, opponents: Int) {
         )
     }
     Text(
-        stringResource(R.string.advisor_compute_time, result.computeMillis),
+        stringResource(R.string.advisor_compute_time, a.computeMillis),
         style = MaterialTheme.typography.labelSmall,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
     )
@@ -230,9 +268,9 @@ private fun HandCategory.labelRes(): Int = when (this) {
 private fun SelectedCards(input: AdvisorInput, onSelectTarget: (CardTarget) -> Unit, onRemove: (PlayingCard) -> Unit) {
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            listOf(
+            listOfNotNull(
                 CardTarget.HERO to R.string.advisor_target_hero,
-                CardTarget.BOARD to R.string.advisor_target_board,
+                (CardTarget.BOARD to R.string.advisor_target_board).takeIf { input.capacity(CardTarget.BOARD) > 0 },
                 CardTarget.SEEN to R.string.advisor_target_seen,
             ).forEach { (target, label) ->
                 FilterChip(
@@ -242,8 +280,10 @@ private fun SelectedCards(input: AdvisorInput, onSelectTarget: (CardTarget) -> U
                 )
             }
         }
-        SlotRow(stringResource(R.string.advisor_target_hero), input.hero, 2, onRemove)
-        SlotRow(stringResource(R.string.advisor_target_board), input.board, 5, onRemove)
+        SlotRow(stringResource(R.string.advisor_target_hero), input.hero, input.capacity(CardTarget.HERO), onRemove)
+        if (input.capacity(CardTarget.BOARD) > 0) {
+            SlotRow(stringResource(R.string.advisor_target_board), input.board, input.capacity(CardTarget.BOARD), onRemove)
+        }
         if (input.seen.isNotEmpty() || input.target == CardTarget.SEEN) {
             SlotRow(stringResource(R.string.advisor_target_seen), input.seen, input.seen.size.coerceAtLeast(1), onRemove)
             Text(
@@ -259,7 +299,7 @@ private fun SelectedCards(input: AdvisorInput, onSelectTarget: (CardTarget) -> U
 private fun SlotRow(title: String, cards: List<PlayingCard>, slots: Int, onRemove: (PlayingCard) -> Unit) {
     Row(verticalAlignment = Alignment.CenterVertically) {
         Text(title, style = MaterialTheme.typography.labelLarge, modifier = Modifier.width(88.dp))
-        Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+        Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
             for (i in 0 until slots) {
                 val card = cards.getOrNull(i)
                 if (card != null) {
@@ -286,7 +326,7 @@ private fun CardPicker(input: AdvisorInput, onTap: (PlayingCard) -> Unit) {
     Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
         SUIT_ORDER.forEach { suit ->
             Row(horizontalArrangement = Arrangement.spacedBy(2.dp), modifier = Modifier.fillMaxWidth()) {
-                RANK_ORDER.forEach { rank ->
+                RANK_ORDER.filter { it in PokerEngines.forVariant(input.variant).deck.ranks }.forEach { rank ->
                     val card = PlayingCard(rank, suit)
                     val isUsed = card in used
                     val color = if (suit.isRed) PokerColors.CardRed else PokerColors.CardBlack
@@ -334,7 +374,7 @@ private fun TableInputs(
                 Icon(Icons.Outlined.Remove, contentDescription = stringResource(R.string.advisor_fewer_opponents))
             }
             Text(input.opponents.toString(), style = MaterialTheme.typography.titleLarge)
-            IconButton(onClick = { onOpponents(input.opponents + 1) }, enabled = input.opponents < MAX_OPPONENTS) {
+            IconButton(onClick = { onOpponents(input.opponents + 1) }, enabled = input.opponents < input.maxOpponents) {
                 Icon(Icons.Outlined.Add, contentDescription = stringResource(R.string.advisor_more_opponents))
             }
         }

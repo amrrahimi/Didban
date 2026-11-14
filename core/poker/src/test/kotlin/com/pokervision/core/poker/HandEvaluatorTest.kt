@@ -61,7 +61,7 @@ class HandEvaluatorTest {
         val cards = IntArray(5)
         for (a in 0 until 52) for (b in a + 1 until 52) for (c in b + 1 until 52) for (d in c + 1 until 52) for (e in d + 1 until 52) {
             cards[0] = a; cards[1] = b; cards[2] = c; cards[3] = d; cards[4] = e
-            counts[HandEvaluator.evaluateIndices(cards, 5) ushr 20]++
+            counts[(HandEvaluator.evaluateIndices(cards, 5) ushr 20) and 0xF]++
         }
         // Standard combinatorics of 2,598,960 five-card hands.
         val expected = longArrayOf(1_302_540, 1_098_240, 123_552, 54_912, 10_200, 5_108, 3_744, 624, 40)

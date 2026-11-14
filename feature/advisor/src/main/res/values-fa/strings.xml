@@ -2,9 +2,7 @@
 <resources>
     <string name="advisor_title">مشاور زنده</string>
     <string name="advisor_new_hand">دست جدید</string>
-    <string name="advisor_variant_not_supported">بازی انتخاب‌شدهٔ شما %1$s است. مشاور فعلاً فقط تگزاس هولدم را محاسبه می‌کند؛ انواع دیگر در حال اضافه شدن هستند.</string>
 
-    <string name="advisor_need_hero">دو کارت دست خود را از پایین انتخاب کنید.</string>
     <string name="advisor_need_board">زمین باید ۳ کارت (فلاپ)، ۴ کارت (ترن) یا ۵ کارت (ریور) داشته باشد.</string>
     <string name="advisor_too_many_cards">برای این تعداد حریف، کارت‌های زیادی علامت خورده است.</string>
 
@@ -52,4 +50,9 @@
     <string name="hand_full_house">فول هاوس</string>
     <string name="hand_quads">چهارتایی</string>
     <string name="hand_straight_flush">استریت فلاش</string>
+    <string name="advisor_need_hero_n">%1$d کارت دست خود را از پایین انتخاب کنید.</string>
+    <string name="advisor_need_hero_range">کارت‌های خود را از پایین انتخاب کنید (%1$d تا %2$d).</string>
+    <string name="advisor_card_not_in_deck">این بازی بدون کارت‌های ۲ تا ۵ است؛ آن کارت‌ها را حذف کنید.</string>
+    <string name="advisor_draw_done">کارت عوض کردم</string>
+    <string name="advisor_draw_advice">نگه دارید: %1$s · %2$d کارت جدید بگیرید</string>
 </resources>

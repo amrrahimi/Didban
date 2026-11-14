@@ -10,7 +10,8 @@
 - Hole cards must be shown to the camera on their own first; if more than two unknown cards are visible the app asks instead of guessing.
 - Model weights are AGPL-3.0 (third party). Fine for personal use; distributing the app requires complying with AGPL.
 - APK is ~106 MB (model 38 MB + ONNX Runtime for three CPU types).
-- **Advisor covers Texas Hold'em only.** Other variants show a notice.
+- Non-Hold'em equities are Monte Carlo estimates (shown with ±). Stud up-cards are removed from the deck but not attributed to a particular opponent. In Draw, simulated opponents draw by one fixed standard rule.
+- Short Deck uses "trips beat a straight" (the common modern rule); the engine supports the other ordering but the app does not expose a switch yet.
 - **Advice quality:** opponents are modelled as holding random cards. Real opponents who stay in or bet big usually hold stronger hands, so the advice is too optimistic in those spots. Position, bet sizing, bluffing and future betting rounds are ignored. It is a learning aid, not a solver.
 - "Improving cards" counts cards that improve hero's own hand category, not true outs against an opponent's hand.
 - Game sessions/hand histories are not recorded yet; statistics remain a placeholder.

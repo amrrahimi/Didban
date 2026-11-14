@@ -41,6 +41,7 @@ class SettingsViewModelTest {
         override val status: DetectorStatus = DetectorStatus.ModelMissing
         override fun prepare(): DetectorStatus = status
         override fun detect(image: android.graphics.Bitmap, scoreThreshold: Float) = FrameDetections(emptyList(), 0)
+        override fun scanPhoto(photo: android.graphics.Bitmap, scoreThreshold: Float) = FrameDetections(emptyList(), 0)
     }
 
     @Before

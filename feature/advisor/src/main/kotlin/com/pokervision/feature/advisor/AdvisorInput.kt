@@ -1,22 +1,25 @@
 package com.pokervision.feature.advisor
 
+import com.pokervision.core.domain.usecase.HandQuery
+import com.pokervision.core.domain.vision.TableRules
 import com.pokervision.core.model.card.PlayingCard
-import com.pokervision.core.poker.holdem.HoldemSituation
+import com.pokervision.core.model.game.PokerVariant
+import com.pokervision.core.poker.engine.PokerEngines
 
 /** Which list a tapped card goes into. */
-enum class CardTarget(val capacity: Int) {
-    HERO(2),
-    BOARD(5),
+enum class CardTarget {
+    HERO,
+    BOARD,
 
-    /** Cards known to be out of this hand (e.g. a player showed a card when folding). */
-    SEEN(MAX_SEEN_CARDS),
+    /** Cards known to be out of this hand (shown by a folded player; opponents' up-cards in Stud). */
+    SEEN,
 }
 
-private const val MAX_SEEN_CARDS = 12
+private const val MAX_SEEN_CARDS = 21
 const val MIN_OPPONENTS = 1
-const val MAX_OPPONENTS = 9
 
 data class AdvisorInput(
+    val variant: PokerVariant = PokerVariant.TEXAS_HOLDEM,
     val hero: List<PlayingCard> = emptyList(),
     val board: List<PlayingCard> = emptyList(),
     val seen: List<PlayingCard> = emptyList(),
@@ -24,6 +27,8 @@ data class AdvisorInput(
     val pot: Long? = null,
     val toCall: Long? = null,
     val target: CardTarget = CardTarget.HERO,
+    /** Five Card Draw: whether the draw has happened. */
+    val drawDone: Boolean = false,
     /** Incremented by "new hand"; lets the UI reset its text fields. */
     val handNumber: Int = 1,
 ) {
@@ -34,32 +39,37 @@ data class AdvisorInput(
         CardTarget.BOARD -> board
         CardTarget.SEEN -> seen
     }
+
+    fun capacity(target: CardTarget): Int = when (target) {
+        CardTarget.HERO -> TableRules.mineCapacity(variant)
+        CardTarget.BOARD -> if (TableRules.usesBoard(variant)) TableRules.BOARD_CAPACITY else 0
+        CardTarget.SEEN -> MAX_SEEN_CARDS
+    }
+
+    val maxOpponents: Int get() = TableRules.maxOpponents(variant)
 }
 
-/** Why no analysis can be shown yet. */
-enum class MissingInput { HERO_CARDS, BOARD_INCOMPLETE, TOO_MANY_CARDS }
-
-/**
- * Pure editing rules for the advisor form. Kept free of Android so they are unit-tested on the JVM.
- */
+/** Pure editing rules for the advisor form, for every variant. Unit-tested on the JVM. */
 object AdvisorInputReducer {
 
     /**
-     * Tapping a card that is already used removes it from wherever it is. Otherwise it is added to the
-     * current target if there is room. Filling the two hole cards moves the target to the board.
+     * Tapping a card that is already used removes it. Otherwise it is added to the current target if
+     * there is room and the card exists in this variant's deck. Filling the hero's cards moves the
+     * target to the board in community-card games.
      */
     fun tapCard(input: AdvisorInput, card: PlayingCard): AdvisorInput {
         if (card in input.usedCards) {
             return input.copy(hero = input.hero - card, board = input.board - card, seen = input.seen - card)
         }
-        val current = input.cardsFor(input.target)
-        if (current.size >= input.target.capacity) return input
+        if (!PokerEngines.forVariant(input.variant).deck.contains(card)) return input
+        if (input.cardsFor(input.target).size >= input.capacity(input.target)) return input
         val updated = when (input.target) {
             CardTarget.HERO -> input.copy(hero = input.hero + card)
             CardTarget.BOARD -> input.copy(board = input.board + card)
             CardTarget.SEEN -> input.copy(seen = input.seen + card)
         }
-        return if (updated.target == CardTarget.HERO && updated.hero.size == CardTarget.HERO.capacity) {
+        val heroFull = updated.hero.size == updated.capacity(CardTarget.HERO)
+        return if (updated.target == CardTarget.HERO && heroFull && TableRules.usesBoard(updated.variant)) {
             updated.copy(target = CardTarget.BOARD)
         } else {
             updated
@@ -67,7 +77,7 @@ object AdvisorInputReducer {
     }
 
     fun setOpponents(input: AdvisorInput, opponents: Int) =
-        input.copy(opponents = opponents.coerceIn(MIN_OPPONENTS, MAX_OPPONENTS))
+        input.copy(opponents = opponents.coerceIn(MIN_OPPONENTS, input.maxOpponents))
 
     /** Parses a chip amount typed by the user; blank or invalid becomes null (unknown). Accepts Persian digits. */
     fun parseAmount(text: String): Long? {
@@ -81,26 +91,24 @@ object AdvisorInputReducer {
         return latin.toLongOrNull()?.takeIf { it >= 0 }
     }
 
-    /** Keeps opponents; clears cards and money for the next hand. */
-    fun newHand(input: AdvisorInput) = AdvisorInput(opponents = input.opponents, handNumber = input.handNumber + 1)
+    /** Keeps variant and opponents; clears cards and money for the next hand. */
+    fun newHand(input: AdvisorInput) =
+        AdvisorInput(variant = input.variant, opponents = input.opponents, handNumber = input.handNumber + 1)
 
-    fun missing(input: AdvisorInput): MissingInput? {
-        if (input.hero.size < 2) return MissingInput.HERO_CARDS
-        if (input.board.size in 1..2) return MissingInput.BOARD_INCOMPLETE
-        val needed = 2 * input.opponents + (5 - input.board.size)
-        if (52 - input.usedCards.size < needed) return MissingInput.TOO_MANY_CARDS
-        return null
+    fun setVariant(input: AdvisorInput, variant: PokerVariant): AdvisorInput {
+        if (variant == input.variant) return input
+        val fresh = newHand(input).copy(variant = variant)
+        return setOpponents(fresh, fresh.opponents)
     }
 
-    fun toSituation(input: AdvisorInput): HoldemSituation? {
-        if (missing(input) != null) return null
-        return HoldemSituation(
-            heroCards = input.hero,
-            board = input.board,
-            opponents = input.opponents,
-            deadCards = input.seen,
-            pot = input.pot,
-            toCall = input.toCall,
-        )
-    }
+    fun toQuery(input: AdvisorInput) = HandQuery(
+        variant = input.variant,
+        mine = input.hero,
+        board = input.board,
+        seen = input.seen,
+        opponents = input.opponents,
+        pot = input.pot,
+        toCall = input.toCall,
+        drawDone = input.drawDone,
+    )
 }
