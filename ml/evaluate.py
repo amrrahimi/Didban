@@ -69,9 +69,10 @@ def main():
     ap.add_argument("--candidate", default="ml/build/model/card_detector.onnx")
     ap.add_argument("--baseline", default="core/vision/src/main/assets/models/card_detector.onnx")
     ap.add_argument("--out", default="ml/build/model/report.md")
+    ap.add_argument("--candidate-name", default="candidate (trained on your deck)")
     args = ap.parse_args()
     photos = sorted(Path(args.test).glob("*.jpg"))
-    results = {"candidate (trained on your deck)": evaluate(args.candidate, photos)}
+    results = {args.candidate_name: evaluate(args.candidate, photos)}
     if Path(args.baseline).exists():
         results["current app model (lgd-cards-gen3)"] = evaluate(args.baseline, photos)
     lines = [f"# Card model evaluation\n", f"Held-out photos: {len(photos)} (never used in training).\n",

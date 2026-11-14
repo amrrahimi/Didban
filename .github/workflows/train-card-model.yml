@@ -67,7 +67,8 @@ jobs:
         working-directory: ml
         run: |
           python evaluate.py --test build/dataset/test --candidate build/model/card_detector.onnx \
-            --baseline ../core/vision/src/main/assets/models/card_detector.onnx --out build/model/report.md
+            --baseline ../core/vision/src/main/assets/models/card_detector.onnx --out build/model/report.md \
+            --candidate-name "candidate (trained on: ${{ steps.cfg.outputs.data }}, ${{ steps.cfg.outputs.epochs }} epochs)"
           cat build/dataset/prepare_report.json
           cat build/model/report.md >> "$GITHUB_STEP_SUMMARY"
           sha256sum build/model/card_detector.onnx
