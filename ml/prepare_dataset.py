@@ -26,7 +26,7 @@ from card_geometry import CANON_H, CANON_W, INDEX_BR, INDEX_TL, card_homography,
 # Same class order as the app (CardLabels.DEFAULT_ORDER) and the original model.
 NAMES = [r + s for r in ["10", "2", "3", "4", "5", "6", "7", "8", "9", "A", "J", "K", "Q"] for s in "CDHS"]
 CLASS = {n: i for i, n in enumerate(NAMES)}
-TEST_SHOTS = 2
+TEST_SHOTS = 1  # the app takes 4 photos per card: 3 train, 1 test
 IMG = 640
 
 

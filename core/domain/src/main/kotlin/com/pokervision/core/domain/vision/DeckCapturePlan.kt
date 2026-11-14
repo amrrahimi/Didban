@@ -25,10 +25,11 @@ sealed interface CaptureTarget {
  */
 object DeckCapturePlan {
 
-    const val SHOTS_PER_TARGET = 6
+    /** 3 photos for training + 1 held out for testing; about 10-15 minutes for a whole deck. */
+    const val SHOTS_PER_TARGET = 4
 
     /** Minimum time between automatic shots, so the user's small phone movements add variety. */
-    const val MIN_SHOT_INTERVAL_MS = 500L
+    const val MIN_SHOT_INTERVAL_MS = 350L
 
     val SUIT_ORDER = listOf(Suit.SPADES, Suit.HEARTS, Suit.DIAMONDS, Suit.CLUBS)
 

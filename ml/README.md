@@ -11,7 +11,7 @@ Trains a card detector on the user's own deck from the app's **Learn my cards** 
    (`report.md`, `card_detector.onnx`).
 4. Only after reviewing the report is the candidate switched on in the app (`scripts/fetch_card_model.sh`).
 
-Split rule: for every card the last 2 photos are held out for testing and are never used in training or in
+Split rule: for every card the last photo is held out for testing and are never used in training or in
 the synthetic scenes. They come from the same capture session, so real-game accuracy can be lower.
 
 `"data": "standin"` uses public single-card photos (Hugging Face `Mariofm02/cards_images`) to test the
