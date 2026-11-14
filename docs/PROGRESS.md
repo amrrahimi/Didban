@@ -64,6 +64,16 @@ The product goal is a **live advisor for learning and friendly games where all p
 | Manual advisor and Live Table for every variant (variant switch on screen) | 🟡 | `AdvisorInputReducerTest`; manual check pending |
 | Learn my cards: guided capture + export of the user's deck photos | 🟡 | waiting for the user's photos to train a deck-specific model |
 
+## Training pipeline for the user's own deck (ml/)
+
+| Item | Status | Verification |
+|---|---|---|
+| Auto-labelling of corner indices from card outline (OpenCV) | ✅ | 14/14 synthetic poses within ~3 px; real-photo labels 416/416 contain the glyph |
+| Synthetic table scenes (1–6 cards, rotation, perspective, occlusion-aware labels) | ✅ | visual check of label boxes |
+| YOLO11n training + ONNX export compatible with the app (`[1,56,8400]`, same class order, 10.6 MB) | ✅ | stand-in run in CI; output shape checked |
+| Evaluation vs current model on held-out photos | ✅ | stand-in: current model 28.8% correct on public photos (incl. A♦→4♦, the error the user reported) |
+| Training on the user's photos | ⏳ | waiting for the Learn-my-cards export |
+
 ## Next
 
 | Step | Scope |
