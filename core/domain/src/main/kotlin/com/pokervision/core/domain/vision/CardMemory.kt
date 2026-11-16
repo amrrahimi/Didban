@@ -1,10 +1,6 @@
 package com.pokervision.core.domain.vision
 
 import com.pokervision.core.model.card.PlayingCard
-import java.io.ByteArrayInputStream
-import java.io.ByteArrayOutputStream
-import java.io.DataInputStream
-import java.io.DataOutputStream
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.sqrt
@@ -174,20 +170,18 @@ class CardMemory(private val perCard: Int = DEFAULT_PER_CARD) {
     fun clear() = examples.clear()
 
     fun toBytes(): ByteArray {
-        val bytes = ByteArrayOutputStream()
-        DataOutputStream(bytes).use { out ->
-            out.writeInt(FORMAT)
-            out.writeInt(GlyphFeatures.SIZE)
-            out.writeInt(exampleCount)
-            examples.forEach { (card, list) ->
-                list.forEach { f ->
-                    out.writeUTF(card.code)
-                    out.writeFloat(f.redness)
-                    f.gray.forEach(out::writeFloat)
-                }
+        val out = ByteWriter()
+        out.int(FORMAT)
+        out.int(GlyphFeatures.SIZE)
+        out.int(exampleCount)
+        examples.forEach { (card, list) ->
+            list.forEach { f ->
+                out.text(card.code)
+                out.float(f.redness)
+                f.gray.forEach(out::float)
             }
         }
-        return bytes.toByteArray()
+        return out.bytes()
     }
 
     companion object {
@@ -200,14 +194,13 @@ class CardMemory(private val perCard: Int = DEFAULT_PER_CARD) {
         fun fromBytes(data: ByteArray, perCard: Int = DEFAULT_PER_CARD): CardMemory {
             val memory = CardMemory(perCard)
             runCatching {
-                DataInputStream(ByteArrayInputStream(data)).use { input ->
-                    if (input.readInt() != FORMAT || input.readInt() != GlyphFeatures.SIZE) return memory
-                    repeat(input.readInt()) {
-                        val card = PlayingCard.parse(input.readUTF())
-                        val redness = input.readFloat()
-                        val gray = FloatArray(GlyphFeatures.SIZE) { input.readFloat() }
-                        memory.learn(card, GlyphFeature(gray, redness))
-                    }
+                val input = ByteReader(data)
+                if (input.int() != FORMAT || input.int() != GlyphFeatures.SIZE) return memory
+                repeat(input.int()) {
+                    val card = PlayingCard.parse(input.text())
+                    val redness = input.float()
+                    val gray = FloatArray(GlyphFeatures.SIZE) { input.float() }
+                    memory.learn(card, GlyphFeature(gray, redness))
                 }
             }.onFailure { memory.clear() }
             return memory
@@ -280,4 +273,55 @@ object MemoryRecognizer {
 
     /** Two boxes this much overlapped are the same symbol, whatever card each claims to be. */
     const val DUPLICATE_IOU = 0.6f
+}
+
+/** Big-endian writer (same layout as java.io.DataOutputStream for int/float; text = length + UTF-8). */
+private class ByteWriter {
+    private var buf = ByteArray(1024)
+    private var size = 0
+
+    private fun ensure(n: Int) {
+        if (size + n > buf.size) buf = buf.copyOf(maxOf(buf.size * 2, size + n))
+    }
+
+    fun int(v: Int) {
+        ensure(4)
+        buf[size++] = (v ushr 24).toByte()
+        buf[size++] = (v ushr 16).toByte()
+        buf[size++] = (v ushr 8).toByte()
+        buf[size++] = v.toByte()
+    }
+
+    fun float(v: Float) = int(v.toRawBits())
+
+    fun text(v: String) {
+        val b = v.encodeToByteArray()
+        require(b.size < 0x10000)
+        ensure(2 + b.size)
+        buf[size++] = (b.size ushr 8).toByte()
+        buf[size++] = b.size.toByte()
+        b.copyInto(buf, size)
+        size += b.size
+    }
+
+    fun bytes(): ByteArray = buf.copyOf(size)
+}
+
+private class ByteReader(private val data: ByteArray) {
+    private var pos = 0
+
+    private fun next(): Int {
+        if (pos >= data.size) throw IllegalStateException("Unexpected end of data")
+        return data[pos++].toInt() and 0xFF
+    }
+
+    fun int(): Int = (next() shl 24) or (next() shl 16) or (next() shl 8) or next()
+
+    fun float(): Float = Float.fromBits(int())
+
+    fun text(): String {
+        val n = (next() shl 8) or next()
+        if (pos + n > data.size) throw IllegalStateException("Unexpected end of data")
+        return data.decodeToString(pos, pos + n).also { pos += n }
+    }
 }

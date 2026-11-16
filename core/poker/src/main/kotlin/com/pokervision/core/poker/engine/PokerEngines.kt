@@ -14,7 +14,8 @@ import com.pokervision.core.poker.holdem.HandRules
 import com.pokervision.core.poker.holdem.HandValue
 import com.pokervision.core.poker.holdem.HoldemEquityCalculator
 import com.pokervision.core.poker.holdem.HoldemEquityRequest
-import java.util.SplittableRandom
+import kotlin.random.Random
+import kotlin.time.TimeSource
 import kotlin.math.sqrt
 
 /** What is known at a decision point, for any variant. */
@@ -145,13 +146,13 @@ internal abstract class SimulatedEngine : PokerEngine {
         val partialOk = issue == EngineIssue.HERO_CARD_COUNT && simulatesPartialHero && s.hero.size <= holeAtShowdown &&
             validate(s.copy(hero = emptyList())).let { it == null || it == EngineIssue.HERO_CARD_COUNT }
         require(issue == null || partialOk) { "Invalid situation: $issue" }
-        val start = System.nanoTime()
+        val start = TimeSource.Monotonic.markNow()
         val used = (s.hero + s.board + s.dead).map { it.index }.toSet()
         val pool = deck.cards.map { it.index }.filter { it !in used }.toIntArray()
         val heroMissing = holeAtShowdown - s.hero.size
         val boardMissing = boardAtShowdown - s.board.size
         val draw = heroMissing + boardMissing + holeAtShowdown * s.opponents
-        val rng = SplittableRandom(seed)
+        val rng = Random(seed)
 
         val hero = IntArray(holeAtShowdown)
         s.hero.forEachIndexed { i, c -> hero[i] = c.index }
@@ -189,7 +190,7 @@ internal abstract class SimulatedEngine : PokerEngine {
                 ),
             ),
             method = CalculationMethod.MONTE_CARLO,
-            simulation = SimulationResult(iterations.toLong(), seed, (System.nanoTime() - start) / 1_000_000, 0.95),
+            simulation = SimulationResult(iterations.toLong(), seed, start.elapsedNow().inWholeMilliseconds, 0.95),
         )
     }
 
@@ -387,10 +388,10 @@ internal object DrawEngine : SimulatedEngine() {
     override fun equity(s: EngineSituation, iterations: Int, seed: Long): EquityResult {
         val issue = validate(s)
         require(issue == null || (issue == EngineIssue.HERO_CARD_COUNT && s.hero.size <= 5)) { "Invalid situation: $issue" }
-        val start = System.nanoTime()
+        val start = TimeSource.Monotonic.markNow()
         val used = (s.hero + s.dead).map { it.index }.toSet()
         val pool = deck.cards.map { it.index }.filter { it !in used }.toIntArray()
-        val rng = SplittableRandom(seed)
+        val rng = Random(seed)
         val hero = IntArray(5)
         s.hero.forEachIndexed { i, c -> hero[i] = c.index }
         val heroMissing = 5 - s.hero.size
@@ -430,7 +431,7 @@ internal object DrawEngine : SimulatedEngine() {
                 ),
             ),
             method = CalculationMethod.MONTE_CARLO,
-            simulation = SimulationResult(iterations.toLong(), seed, (System.nanoTime() - start) / 1_000_000, 0.95),
+            simulation = SimulationResult(iterations.toLong(), seed, start.elapsedNow().inWholeMilliseconds, 0.95),
         )
     }
 
@@ -440,22 +441,25 @@ internal object DrawEngine : SimulatedEngine() {
      */
     fun bestDraw(hero: List<PlayingCard>, opponents: Int, dead: List<PlayingCard>, iterations: Int, seed: Long): DrawAdvice {
         require(hero.size == 5) { "Draw needs exactly 5 cards" }
-        var bestMask = 0b11111
-        var bestEquity = -1.0
-        var standPat = 0.0
-        for (mask in 0 until 32) {
+        fun eval(mask: Int, n: Int, sd: Long): Double {
             val keep = hero.filterIndexed { i, _ -> mask and (1 shl i) != 0 }
             val discarded = hero - keep.toSet()
-            val e = equity(EngineSituation(keep, emptyList(), opponents, dead + discarded), iterations, seed).players.first().equity
-            if (mask == 0b11111) standPat = e
-            if (e > bestEquity) {
-                bestEquity = e
-                bestMask = mask
-            }
+            return equity(EngineSituation(keep, emptyList(), opponents, dead + discarded), n, sd).players.first().equity
         }
+        // Quick pass over all 32 options, then a careful second look at the closest contenders:
+        // options a percent or two apart cannot be separated reliably by the quick pass alone.
+        val quick = (0 until 32).associateWith { eval(it, iterations, seed) }
+        val finalists = quick.entries.sortedByDescending { it.value }.take(FINALISTS).map { it.key }.plus(0b11111).distinct()
+        val careful = finalists.associateWith { eval(it, iterations * FINAL_FACTOR, seed + 1) }
+        val bestMask = careful.maxBy { it.value }.key
+        val bestEquity = careful.getValue(bestMask)
+        val standPat = careful.getValue(0b11111)
         val keep = hero.filterIndexed { i, _ -> bestMask and (1 shl i) != 0 }
         return DrawAdvice(keep, hero - keep.toSet(), bestEquity, standPat)
     }
+
+    private const val FINALISTS = 4
+    private const val FINAL_FACTOR = 4
 }
 
 /**

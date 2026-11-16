@@ -6,7 +6,8 @@ import com.pokervision.core.model.analytics.EquityResult
 import com.pokervision.core.model.analytics.PlayerEquity
 import com.pokervision.core.model.analytics.SimulationResult
 import com.pokervision.core.model.card.PlayingCard
-import java.util.SplittableRandom
+import kotlin.random.Random
+import kotlin.time.TimeSource
 import kotlin.math.sqrt
 
 data class HoldemEquityRequest(
@@ -47,7 +48,7 @@ data class HoldemEquityRequest(
 object HoldemEquityCalculator {
 
     fun calculate(request: HoldemEquityRequest): EquityResult {
-        val start = System.nanoTime()
+        val start = TimeSource.Monotonic.markNow()
         val used = (request.heroCards + request.board + request.deadCards).map { it.index }.toSet()
         val deck = (0 until 52).filter { it !in used }.toIntArray()
         val missingBoard = 5 - request.board.size
@@ -102,8 +103,8 @@ object HoldemEquityCalculator {
         )
     }
 
-    private fun monteCarlo(request: HoldemEquityRequest, deck: IntArray, missingBoard: Int, startNanos: Long): EquityResult {
-        val rng = SplittableRandom(request.seed)
+    private fun monteCarlo(request: HoldemEquityRequest, deck: IntArray, missingBoard: Int, startNanos: TimeSource.Monotonic.ValueTimeMark): EquityResult {
+        val rng = Random(request.seed)
         val pool = deck.copyOf()
         val opponents = request.opponents
         val draw = 2 * opponents + missingBoard
@@ -160,7 +161,7 @@ object HoldemEquityCalculator {
         val variance = (shareSqSum / n - mean * mean).coerceAtLeast(0.0)
         val margin = Z95 * sqrt(variance / n)
         val interval = ConfidenceInterval((mean - margin).coerceIn(0.0, 1.0), (mean + margin).coerceIn(0.0, 1.0), 0.95)
-        val durationMs = (System.nanoTime() - startNanos) / 1_000_000
+        val durationMs = startNanos.elapsedNow().inWholeMilliseconds
         return EquityResult(
             players = listOf(
                 PlayerEquity(HoldemEquityRequest.HERO_ID, wins / n, ties / n, mean.coerceIn(0.0, 1.0), interval),

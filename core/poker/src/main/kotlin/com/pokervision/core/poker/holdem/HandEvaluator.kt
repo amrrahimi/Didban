@@ -106,7 +106,7 @@ object HandEvaluator {
 
         var flushMask = 0
         for (s in 0 until 4) {
-            if (Integer.bitCount(suitMask[s]) >= 5) {
+            if (suitMask[s].countOneBits() >= 5) {
                 flushMask = suitMask[s]
                 val sf = straightHigh(flushMask, rules)
                 if (sf >= 0) offer(encode(rules, HandCategory.STRAIGHT_FLUSH, sf))
@@ -135,17 +135,17 @@ object HandEvaluator {
         // cards already make a stronger hand (under every rule set) and the category cannot win.
         if (trip1 >= 0) {
             val kickers = rankMask and (1 shl trip1).inv()
-            if (Integer.bitCount(kickers) >= 2) offer(encodeWithKickers(rules, HandCategory.THREE_OF_A_KIND, intArrayOf(trip1), kickers, 2))
+            if (kickers.countOneBits() >= 2) offer(encodeWithKickers(rules, HandCategory.THREE_OF_A_KIND, intArrayOf(trip1), kickers, 2))
         }
         if (pair1 >= 0 && pair2 >= 0) {
             val kickers = rankMask and (1 shl pair1).inv() and (1 shl pair2).inv()
-            if (Integer.bitCount(kickers) >= 1) offer(encodeWithKickers(rules, HandCategory.TWO_PAIR, intArrayOf(pair1, pair2), kickers, 1))
+            if (kickers.countOneBits() >= 1) offer(encodeWithKickers(rules, HandCategory.TWO_PAIR, intArrayOf(pair1, pair2), kickers, 1))
         }
         if (pair1 >= 0) {
             val kickers = rankMask and (1 shl pair1).inv()
-            if (Integer.bitCount(kickers) >= 3) offer(encodeWithKickers(rules, HandCategory.ONE_PAIR, intArrayOf(pair1), kickers, 3))
+            if (kickers.countOneBits() >= 3) offer(encodeWithKickers(rules, HandCategory.ONE_PAIR, intArrayOf(pair1), kickers, 3))
         }
-        if (Integer.bitCount(rankMask) >= 5) offer(encodeTopBits(rules, HandCategory.HIGH_CARD, rankMask, 5))
+        if (rankMask.countOneBits() >= 5) offer(encodeTopBits(rules, HandCategory.HIGH_CARD, rankMask, 5))
         return best
     }
 
@@ -160,7 +160,7 @@ object HandEvaluator {
 
     private fun highestExcluding(mask: Int, exclude: Int): Int {
         val m = mask and (1 shl exclude).inv()
-        return 31 - Integer.numberOfLeadingZeros(m)
+        return 31 - m.countLeadingZeroBits()
     }
 
     private fun header(rules: HandRules, category: HandCategory): Int =
@@ -181,7 +181,7 @@ object HandEvaluator {
         var m = mask
         var shift = 16
         repeat(n) {
-            val r = 31 - Integer.numberOfLeadingZeros(m)
+            val r = 31 - m.countLeadingZeroBits()
             v = v or (r shl shift)
             m = m and (1 shl r).inv()
             shift -= 4
@@ -198,7 +198,7 @@ object HandEvaluator {
         }
         var m = kickerMask
         repeat(kickers) {
-            val r = 31 - Integer.numberOfLeadingZeros(m)
+            val r = 31 - m.countLeadingZeroBits()
             v = v or (r shl shift)
             m = m and (1 shl r).inv()
             shift -= 4
