@@ -15,7 +15,7 @@ class LiveSessionTest {
         val s = session()
         assertEquals("need_mine", Advisor.analyze(s.adviceRequest()).issue)
         s.addCards(listOf("AS", "AH"), LiveSession.MINE)
-        assertEquals(listOf("AS", "AH"), s.mine.map { it.code })
+        assertEquals(listOf("As", "Ah"), s.mine.map { it.code })
         val advice = Advisor.analyze(s.adviceRequest())
         assertNull(advice.issue)
         assertEquals("bet", advice.action)
@@ -52,7 +52,7 @@ class LiveSessionTest {
         s.addCards(listOf("AS", "AD", "7C", "4H", "2S"), LiveSession.MINE)
         val a = Advisor.analyze(s.adviceRequest())
         assertNotNull(a.drawKeep)
-        assertEquals(setOf("AS", "AD"), a.drawKeep!!.map { it.code }.toSet())
+        assertEquals(setOf("As", "Ad"), a.drawKeep!!.map { it.code }.toSet())
     }
 
     @Test
