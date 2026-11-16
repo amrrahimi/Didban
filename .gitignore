@@ -22,3 +22,14 @@ core/vision/src/main/assets/models/
 core/vision/src/androidTest/assets/samples/
 __pycache__/
 ml/build/
+
+# iOS build outputs
+ios/shared/build/
+ios/shared/.gradle/
+ios/shared/.kotlin/
+ios/app/build/
+ios/app/PokerVision.xcodeproj/
+ios/app/Payload/
+ios/app/xcodebuild.log
+ios/app/Resources/card_detector.onnx
+ios/app/Resources/card_detector.classes.json

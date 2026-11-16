@@ -1,0 +1,43 @@
+# Xcode project for the iPhone app, generated on CI with XcodeGen (`xcodegen generate`).
+name: PokerVision
+options:
+  bundleIdPrefix: com.pokervision
+  developmentLanguage: fa
+  deploymentTarget:
+    iOS: "16.0"
+packages:
+  onnxruntime:
+    url: https://github.com/microsoft/onnxruntime-swift-package-manager
+    revision: b7fb7f7dea8a2469e6335d95a61b8f36d0dc83b2
+targets:
+  PokerVision:
+    type: application
+    platform: iOS
+    scheme: {}
+    sources:
+      - path: Sources
+      - path: Resources
+    dependencies:
+      - package: onnxruntime
+        product: onnxruntime
+      # Shared Kotlin code (same game engines and card reading as Android), built by ios/shared.
+      - framework: ../shared/build/XCFrameworks/release/PokerCore.xcframework
+        embed: false
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.pokervision.ai
+        PRODUCT_NAME: PokerVision
+        MARKETING_VERSION: "0.9.0"
+        CURRENT_PROJECT_VERSION: "1"
+        GENERATE_INFOPLIST_FILE: YES
+        INFOPLIST_KEY_CFBundleDisplayName: Poker Vision
+        INFOPLIST_KEY_NSCameraUsageDescription: "The camera photographs the cards so the app can read them. Photos stay on this phone."
+        INFOPLIST_KEY_UILaunchScreen_Generation: YES
+        INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone: UIInterfaceOrientationPortrait
+        INFOPLIST_KEY_UIRequiresFullScreen: YES
+        TARGETED_DEVICE_FAMILY: "1"
+        SWIFT_VERSION: "5.0"
+        OTHER_LDFLAGS: "$(inherited) -lc++"
+        ENABLE_BITCODE: NO
+        CODE_SIGNING_ALLOWED: NO
+        CODE_SIGN_IDENTITY: ""

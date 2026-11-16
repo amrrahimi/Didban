@@ -5,6 +5,8 @@ on:
     branches: [poker-vision]
     paths-ignore:
       - "ml/**"
+      - "ios/**"
+      - ".github/workflows/ios.yml"
       - ".github/workflows/train-card-model.yml"
   workflow_dispatch:
 
