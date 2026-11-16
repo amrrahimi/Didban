@@ -88,7 +88,14 @@ object YoloDecoder {
 }
 
 /** A card seen in one frame, built from one or more of its corner pips. */
-data class CardSighting(val card: PlayingCard, val score: Float, val box: BoundingBox, val pipCount: Int)
+data class CardSighting(
+    val card: PlayingCard,
+    val score: Float,
+    val box: BoundingBox,
+    val pipCount: Int,
+    /** Boxes of the corner symbols this card was built from (used to learn the card's look). */
+    val pipBoxes: List<BoundingBox> = emptyList(),
+)
 
 /**
  * The detector boxes corner pips (about two per card). A standard deck contains each card once,
@@ -106,7 +113,7 @@ object PipClusterer {
         val best = group.maxBy { it.score }
         val diagonal = sqrt(best.box.width * best.box.width + best.box.height * best.box.height)
         val members = group.filter { it === best || centerDistance(it.box, best.box) <= maxDistanceInDiagonals * diagonal }
-        CardSighting(card, best.score, union(members.map { it.box }), members.size)
+        CardSighting(card, best.score, union(members.map { it.box }), members.size, members.map { it.box })
     }.sortedByDescending { it.score }
 
     private fun centerDistance(a: BoundingBox, b: BoundingBox): Float {

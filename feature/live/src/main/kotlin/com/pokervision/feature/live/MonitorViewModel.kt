@@ -18,7 +18,7 @@ import com.pokervision.core.domain.vision.TableState
 import com.pokervision.core.model.detection.BoundingBox
 import com.pokervision.core.model.game.PokerVariant
 import com.pokervision.core.poker.engine.EngineIssue
-import com.pokervision.core.vision.CardDetector
+import com.pokervision.core.vision.LearningCardReader
 import com.pokervision.core.vision.DetectorStatus
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -60,7 +60,7 @@ data class MonitorUiState(
 @HiltViewModel
 class MonitorViewModel @Inject constructor(
     @ApplicationContext context: Context,
-    private val detector: CardDetector,
+    private val detector: LearningCardReader,
     private val analyzeHand: AnalyzeHandUseCase,
     private val settingsRepository: SettingsRepository,
 ) : ViewModel() {
@@ -133,8 +133,9 @@ class MonitorViewModel @Inject constructor(
         val crop = CropRect(left, top, right - left, bottom - top)
         val bmp = Bitmap.createBitmap(frame, crop.left, crop.top, crop.width, crop.height)
         return try {
-            detector.detect(bmp, DECODE_THRESHOLD).sightings.map {
-                it.copy(box = FocusRegion.toFrame(it.box, crop, frame.width, frame.height))
+            // Same memory as photo scans: cards the user taught are read reliably here too.
+            detector.detect(bmp, DECODE_THRESHOLD).cards.map { it.sighting }.map {
+                it.copy(box = FocusRegion.toFrame(it.box, crop, frame.width, frame.height), pipBoxes = emptyList())
             }
         } finally {
             if (bmp !== frame) bmp.recycle()

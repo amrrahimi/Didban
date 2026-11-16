@@ -17,6 +17,14 @@
 - Game sessions/hand histories are not recorded yet; statistics remain a placeholder.
 - Videos imported with v0.2 still appear in History (delete only).
 
+## Learning from corrections (v0.8)
+- The first scans of a new card design still depend on the base model; the memory helps only after
+  the user has corrected or confirmed those cards (a few times each works best).
+- Cards left uncorrected are learned as correct. A wrong reading that the user ignores is learned
+  too; correcting it later removes that example.
+- Fingerprints assume upright (or upside-down) corners; cards photographed sideways match poorly.
+- A card the model does not propose at all can only be taught by tapping it.
+
 ## Technical
 - Imported media is copied in full into app storage; very large videos take time and space. There is no size limit or progress percentage yet.
 - If a photo/video is written but the database insert fails, the file is deleted; if the app is killed between the camera write and the insert, an orphan file can remain (counted in storage usage, removed by "Delete all data").

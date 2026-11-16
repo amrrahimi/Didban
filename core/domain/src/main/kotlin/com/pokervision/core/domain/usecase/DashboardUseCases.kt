@@ -3,6 +3,7 @@ package com.pokervision.core.domain.usecase
 import com.pokervision.core.common.result.AppError
 import com.pokervision.core.common.result.AppResult
 import com.pokervision.core.domain.repository.GameRepository
+import com.pokervision.core.domain.repository.LearnedCardsRepository
 import com.pokervision.core.domain.repository.MediaRepository
 import com.pokervision.core.domain.repository.SettingsRepository
 import com.pokervision.core.model.game.PokerVariant
@@ -55,8 +56,17 @@ class ClearAllLocalDataUseCase @Inject constructor(
     private val mediaRepository: MediaRepository,
     private val gameRepository: GameRepository,
     private val settingsRepository: SettingsRepository,
+    private val learnedCards: LearnedCardsRepository = LearnedCardsRepository.NONE,
 ) {
     suspend operator fun invoke(): AppResult<Unit> {
+        val learned = try {
+            learnedCards.clear()
+            AppResult.Success(Unit)
+        } catch (c: kotlin.coroutines.cancellation.CancellationException) {
+            throw c
+        } catch (t: Exception) {
+            AppResult.Failure(AppError.Io("Failed to clear learned cards", t))
+        }
         val media = mediaRepository.deleteAll()
         val games = gameRepository.deleteAll()
         val settings = try {
@@ -67,6 +77,6 @@ class ClearAllLocalDataUseCase @Inject constructor(
         } catch (t: Exception) {
             AppResult.Failure(AppError.Io("Failed to reset settings", t))
         }
-        return listOf(media, games, settings).firstOrNull { it is AppResult.Failure } ?: AppResult.Success(Unit)
+        return listOf(media, games, settings, learned).firstOrNull { it is AppResult.Failure } ?: AppResult.Success(Unit)
     }
 }

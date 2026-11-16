@@ -74,6 +74,28 @@ The product goal is a **live advisor for learning and friendly games where all p
 | Evaluation vs current model on held-out photos | ✅ | stand-in: current model 28.8% correct on public photos (incl. A♦→4♦, the error the user reported) |
 | Training on the user's photos | ⏳ | waiting for the Learn-my-cards export |
 
+## v0.7 — Monitor mode
+Phone on a stand, pointed at the computer screen. The user marks two areas once (own cards, board);
+each area is cropped and read continuously, and a card counts only after several agreeing frames
+(`MonitorReader`/`CardConfirmer`). Advice updates by itself.
+
+## v0.8 — Learns from the user's corrections (on the phone)
+Card designs differ between games and can change, so instead of a fixed training set the app
+learns from the user while playing:
+- Every corner symbol the model proposes (even weak proposals, threshold 0.12) is cut out and
+  turned into a small brightness-independent "fingerprint" (`GlyphFeatures`, 20x28 grayscale +
+  redness, also matched upside down).
+- `CardMemory` keeps up to 12 recent examples per card in `files/card_memory.bin`; newest win, so
+  a new card design takes over after a few hands.
+- `MemoryRecognizer` overrides the model when an example matches clearly (similarity >= 0.80 and
+  0.05 ahead of any other card), or confirms the model when both agree.
+- On the photo: each card shows its reading; tap a box to correct it ("not a card" also offered),
+  tap a missed corner to add and teach it. Cards left unchanged are learned when the user goes
+  back to the camera / starts a new hand (only if still on the table).
+- Monitor mode reads with the same memory. "Forget learned cards" and "Delete all data" erase it.
+- Unit tests: `CardMemoryTest` (13). Real-world accuracy gain is **not measured**: it depends on
+  how many corrections the user makes.
+
 ## Next
 
 | Step | Scope |

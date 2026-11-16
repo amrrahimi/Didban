@@ -81,4 +81,12 @@
     <string name="monitor_reset_areas">Reset areas</string>
     <string name="monitor_speed">One reading every %1$s s</string>
     <string name="monitor_tips">Tips: keep the phone still on a stand, fill the picture with the game window, turn the screen brightness down a little if the picture shines, and avoid lamps reflecting on the monitor. Mark the two areas once; they are remembered.</string>
+    <string name="learn_tap_help">Wrong card? Tap its box and choose the right one. A card that was missed? Tap its corner (number and suit) and choose it. The app remembers your answers and reads these cards better next time.</string>
+    <string name="learn_correct_title">Read as %1$s. What card is it?</string>
+    <string name="learn_teach_title">Which card is here?</string>
+    <string name="learn_not_a_card">Not a card</string>
+    <string name="learn_memory_empty">Nothing learned yet: correct the cards after each photo and the app will learn them.</string>
+    <string name="learn_memory_count">Learned from you: %1$d card corners</string>
+    <string name="learn_memory_forget">Forget learned cards</string>
+    <string name="learn_memory_forget_confirm">Everything the app learned from your corrections will be erased (useful if the game changed its card design completely).</string>
 </resources>

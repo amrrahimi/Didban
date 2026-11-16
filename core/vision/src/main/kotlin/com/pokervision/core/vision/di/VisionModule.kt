@@ -1,6 +1,8 @@
 package com.pokervision.core.vision.di
 
+import com.pokervision.core.domain.repository.LearnedCardsRepository
 import com.pokervision.core.vision.CardDetector
+import com.pokervision.core.vision.CardMemoryStore
 import com.pokervision.core.vision.OnnxCardDetector
 import dagger.Binds
 import dagger.Module
@@ -12,4 +14,7 @@ import dagger.hilt.components.SingletonComponent
 abstract class VisionModule {
     @Binds
     abstract fun bindCardDetector(impl: OnnxCardDetector): CardDetector
+
+    @Binds
+    abstract fun bindLearnedCards(impl: CardMemoryStore): LearnedCardsRepository
 }

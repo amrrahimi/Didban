@@ -13,6 +13,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -33,6 +34,7 @@ import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.CameraAlt
 import androidx.compose.material.icons.outlined.Refresh
 import androidx.compose.material.icons.outlined.Remove
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
@@ -61,6 +63,10 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.drawText
+import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -160,6 +166,10 @@ private fun ScanContent(viewModel: ScanViewModel) {
     val phase by viewModel.phase.collectAsStateWithLifecycle()
     val analysis by viewModel.analysis.collectAsStateWithLifecycle()
     val detector by viewModel.detectorStatus.collectAsStateWithLifecycle()
+    val learned by viewModel.learnedExamples.collectAsStateWithLifecycle()
+    var correcting by remember { mutableStateOf<Int?>(null) }
+    var teaching by remember { mutableStateOf<Pair<Float, Float>?>(null) }
+    var confirmForget by remember { mutableStateOf(false) }
 
     val controller = remember { ScanCameraController(context.applicationContext) }
     var previewView by remember { mutableStateOf<PreviewView?>(null) }
@@ -193,7 +203,11 @@ private fun ScanContent(viewModel: ScanViewModel) {
                     modifier = Modifier.fillMaxSize(),
                 )
                 when (val p = phase) {
-                    is ScanPhase.Result -> PhotoWithBoxes(p)
+                    is ScanPhase.Result -> PhotoWithBoxes(
+                        p,
+                        onBoxTap = { correcting = it },
+                        onEmptyTap = { x, y -> teaching = x to y },
+                    )
                     is ScanPhase.Working -> Box(Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.5f)), contentAlignment = Alignment.Center) {
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
                             CircularProgressIndicator()
@@ -255,7 +269,54 @@ private fun ScanContent(viewModel: ScanViewModel) {
                 Spacer(Modifier.width(6.dp))
                 Text(stringResource(R.string.live_new_hand))
             }
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    if (learned == 0) stringResource(R.string.learn_memory_empty) else stringResource(R.string.learn_memory_count, learned),
+                    color = Color.White.copy(alpha = 0.7f),
+                    style = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier.weight(1f),
+                )
+                if (learned > 0) TextButton(onClick = { confirmForget = true }) { Text(stringResource(R.string.learn_memory_forget)) }
+            }
         }
+    }
+
+    val result = phase as? ScanPhase.Result
+    val box = correcting?.let { result?.boxes?.getOrNull(it) }
+    if (result != null && box != null) {
+        CardPickerDialog(
+            variant = table.variant,
+            used = emptySet(),
+            title = stringResource(R.string.learn_correct_title, cardLabel(box.card)),
+            onPick = { card -> viewModel.correctBox(correcting!!, card); correcting = null },
+            onNotACard = { viewModel.dismissBox(correcting!!); correcting = null },
+            onDismiss = { correcting = null },
+        )
+    } else if (correcting != null) {
+        correcting = null
+    }
+    val tap = teaching
+    if (result != null && tap != null) {
+        CardPickerDialog(
+            variant = table.variant,
+            used = emptySet(),
+            title = stringResource(R.string.learn_teach_title),
+            onPick = { card -> viewModel.teachAt(tap.first, tap.second, card); teaching = null },
+            onDismiss = { teaching = null },
+        )
+    } else if (tap != null) {
+        teaching = null
+    }
+    if (confirmForget) {
+        AlertDialog(
+            onDismissRequest = { confirmForget = false },
+            title = { Text(stringResource(R.string.learn_memory_forget)) },
+            text = { Text(stringResource(R.string.learn_memory_forget_confirm)) },
+            confirmButton = {
+                TextButton(onClick = { confirmForget = false; viewModel.forgetLearned() }) { Text(stringResource(R.string.live_reject_yes)) }
+            },
+            dismissButton = { TextButton(onClick = { confirmForget = false }) { Text(stringResource(R.string.live_reject_no)) } },
+        )
     }
 }
 
@@ -279,19 +340,49 @@ private fun StatusLine(detector: DetectorStatus, cameraError: Boolean, phase: Sc
 }
 
 @Composable
-private fun PhotoWithBoxes(result: ScanPhase.Result) {
+private fun PhotoWithBoxes(result: ScanPhase.Result, onBoxTap: (Int) -> Unit, onEmptyTap: (Float, Float) -> Unit) {
     val image = remember(result.photo) { result.photo.asImageBitmap() }
+    val measurer = rememberTextMeasurer()
     Box(Modifier.fillMaxSize().background(Color.Black), contentAlignment = Alignment.Center) {
         Box(Modifier.aspectRatio(result.photo.width.toFloat() / result.photo.height)) {
             Image(image, contentDescription = null, contentScale = ContentScale.Fit, modifier = Modifier.fillMaxSize())
-            Canvas(Modifier.fillMaxSize()) {
+            Canvas(
+                Modifier
+                    .fillMaxSize()
+                    .pointerInput(result) {
+                        detectTapGestures { pos ->
+                            val x = pos.x / size.width
+                            val y = pos.y / size.height
+                            val hit = result.boxes.withIndex()
+                                .filter { (_, b) ->
+                                    val mx = maxOf(b.box.width * 0.3f, 0.02f)
+                                    val my = maxOf(b.box.height * 0.3f, 0.02f)
+                                    x in (b.box.left - mx)..(b.box.right + mx) && y in (b.box.top - my)..(b.box.bottom + my)
+                                }
+                                .minByOrNull { (_, b) -> b.box.area }
+                            if (hit != null) onBoxTap(hit.index) else onEmptyTap(x, y)
+                        }
+                    },
+            ) {
                 result.boxes.forEach { b ->
+                    val color = when {
+                        b.byUser -> PokerColors.Gold
+                        b.accepted -> PokerColors.ConfidenceHigh
+                        else -> PokerColors.ConfidenceMedium
+                    }
+                    val topLeft = Offset(b.box.left * size.width, b.box.top * size.height)
                     drawRect(
-                        color = if (b.accepted) PokerColors.ConfidenceHigh else PokerColors.ConfidenceMedium,
-                        topLeft = Offset(b.box.left * size.width, b.box.top * size.height),
+                        color = color,
+                        topLeft = topLeft,
                         size = Size(b.box.width * size.width, b.box.height * size.height),
                         style = Stroke(width = 3.dp.toPx()),
                     )
+                    val label = cardLabel(b.card) + (if (b.accepted || b.byUser) "" else "?") + (if (b.fromMemory && !b.byUser) " •" else "")
+                    val layout = measurer.measure(label, TextStyle(color = Color.Black, fontSize = 13.sp, fontWeight = FontWeight.Bold))
+                    val lx = topLeft.x.coerceIn(0f, (size.width - layout.size.width).coerceAtLeast(0f))
+                    val ly = (topLeft.y - layout.size.height - 2.dp.toPx()).let { if (it < 0f) b.box.bottom * size.height + 2.dp.toPx() else it }
+                    drawRect(color, Offset(lx - 2.dp.toPx(), ly), Size(layout.size.width + 4.dp.toPx(), layout.size.height.toFloat()))
+                    drawText(layout, topLeft = Offset(lx, ly))
                 }
             }
         }
@@ -315,6 +406,7 @@ private fun ResultBar(result: ScanPhase.Result, onAccept: (PlayingCard) -> Unit,
                 }
             }
         }
+        Text(stringResource(R.string.learn_tap_help), color = Color.White.copy(alpha = 0.8f), style = MaterialTheme.typography.bodySmall)
         TextButton(onClick = onClose) { Text(stringResource(R.string.scan_back_to_camera)) }
     }
 }
@@ -379,11 +471,19 @@ private fun CardRow(title: String, cards: List<PlayingCard>, slots: Int, onCardT
 }
 
 @Composable
-private fun CardPickerDialog(variant: PokerVariant, used: Set<PlayingCard>, onPick: (PlayingCard) -> Unit, onDismiss: () -> Unit) {
+private fun CardPickerDialog(
+    variant: PokerVariant,
+    used: Set<PlayingCard>,
+    onPick: (PlayingCard) -> Unit,
+    onDismiss: () -> Unit,
+    title: String? = null,
+    onNotACard: (() -> Unit)? = null,
+) {
     val deck = PokerEngines.forVariant(variant).deck
     Dialog(onDismissRequest = onDismiss) {
         Surface(shape = RoundedCornerShape(16.dp), color = MaterialTheme.colorScheme.surface) {
             Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                if (title != null) Text(title, style = MaterialTheme.typography.titleSmall)
                 listOf(
                     com.pokervision.core.model.card.Suit.SPADES, com.pokervision.core.model.card.Suit.HEARTS,
                     com.pokervision.core.model.card.Suit.DIAMONDS, com.pokervision.core.model.card.Suit.CLUBS,
@@ -410,7 +510,10 @@ private fun CardPickerDialog(variant: PokerVariant, used: Set<PlayingCard>, onPi
                         }
                     }
                 }
-                TextButton(onClick = onDismiss, modifier = Modifier.align(Alignment.End)) { Text(stringResource(R.string.live_cancel)) }
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+                    if (onNotACard != null) TextButton(onClick = onNotACard) { Text(stringResource(R.string.learn_not_a_card)) }
+                    TextButton(onClick = onDismiss) { Text(stringResource(R.string.live_cancel)) }
+                }
             }
         }
     }

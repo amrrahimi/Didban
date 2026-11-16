@@ -38,6 +38,9 @@ sealed interface DetectorStatus {
 
 data class FrameDetections(val sightings: List<CardSighting>, val inferenceMillis: Long)
 
+/** Raw corner symbols found by the model (before grouping into cards); [labels] maps class indices. */
+data class PipScan(val pips: List<PipDetection>, val labels: List<PlayingCard>, val inferenceMillis: Long)
+
 interface CardDetector {
     val model: ModelInfo
     val status: DetectorStatus
@@ -53,6 +56,12 @@ interface CardDetector {
      * symbols keep enough pixels. Boxes are normalized to [photo]. Blocking (a few seconds at most).
      */
     fun scanPhoto(photo: Bitmap, scoreThreshold: Float): FrameDetections
+
+    /** Corner symbols on a single image (no grouping), for re-reading with the user's examples. */
+    fun framePips(image: Bitmap, scoreThreshold: Float): PipScan = PipScan(emptyList(), emptyList(), 0)
+
+    /** Like [scanPhoto] (full image + tiles) but returns the symbols before grouping. */
+    fun photoPips(photo: Bitmap, scoreThreshold: Float): PipScan = PipScan(emptyList(), emptyList(), 0)
 }
 
 /**
@@ -131,8 +140,23 @@ class OnnxCardDetector @Inject constructor(
 
     @Synchronized
     override fun scanPhoto(photo: Bitmap, scoreThreshold: Float): FrameDetections {
+        val scan = photoPips(photo, scoreThreshold)
+        return FrameDetections(PipClusterer.cluster(scan.pips, labels), scan.inferenceMillis)
+    }
+
+    @Synchronized
+    override fun framePips(image: Bitmap, scoreThreshold: Float): PipScan {
         prepare()
-        if (session == null) return FrameDetections(emptyList(), 0)
+        if (session == null) return PipScan(emptyList(), labels, 0)
+        val start = System.nanoTime()
+        val pips = detectPips(image, scoreThreshold)
+        return PipScan(pips, labels, (System.nanoTime() - start) / 1_000_000)
+    }
+
+    @Synchronized
+    override fun photoPips(photo: Bitmap, scoreThreshold: Float): PipScan {
+        prepare()
+        if (session == null) return PipScan(emptyList(), labels, 0)
         val start = System.nanoTime()
         val pips = ArrayList(detectPips(photo, scoreThreshold))
         val tiles = TilePlan.tiles(photo.width, photo.height)
@@ -150,7 +174,7 @@ class OnnxCardDetector @Inject constructor(
         }
         // The same symbol is usually found by the full-image pass and one or two tiles.
         val merged = YoloDecoder.nms(pips, YoloDecoder.DEFAULT_IOU_THRESHOLD)
-        return FrameDetections(PipClusterer.cluster(merged, labels), (System.nanoTime() - start) / 1_000_000)
+        return PipScan(merged, labels, (System.nanoTime() - start) / 1_000_000)
     }
 
     /** Runs the model once on [image] (letterboxed to 640) and returns pips normalized to [image]. */

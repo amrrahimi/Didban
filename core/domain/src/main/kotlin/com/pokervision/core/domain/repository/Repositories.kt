@@ -63,3 +63,14 @@ interface SettingsRepository {
 
     suspend fun resetToDefaults()
 }
+
+/** Card looks the user has taught the recognizer on this phone (see CardMemory). */
+interface LearnedCardsRepository {
+    suspend fun clear()
+
+    companion object {
+        val NONE = object : LearnedCardsRepository {
+            override suspend fun clear() = Unit
+        }
+    }
+}

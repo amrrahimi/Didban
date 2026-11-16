@@ -81,4 +81,12 @@
     <string name="monitor_reset_areas">بازنشانی محدوده‌ها</string>
     <string name="monitor_speed">هر %1$s ثانیه یک بار خوانده می‌شود</string>
     <string name="monitor_tips">نکته‌ها: گوشی را روی پایه ثابت نگه دارید، پنجرهٔ بازی کل تصویر را پر کند، اگر تصویر برق می‌زند نور مانیتور را کمی کم کنید، و نور لامپ روی مانیتور منعکس نشود. دو محدوده را فقط یک بار مشخص کنید؛ برنامه آن‌ها را به خاطر می‌سپارد.</string>
+    <string name="learn_tap_help">کارتی اشتباه خوانده شده؟ روی کادرش بزنید و کارت درست را انتخاب کنید. کارتی خوانده نشده؟ روی گوشهٔ آن (عدد و خال) بزنید و انتخابش کنید. برنامه جواب شما را به خاطر می‌سپارد و دفعهٔ بعد این کارت‌ها را بهتر می‌خواند.</string>
+    <string name="learn_correct_title">%1$s خوانده شد. این کارت چیست؟</string>
+    <string name="learn_teach_title">اینجا چه کارتی است؟</string>
+    <string name="learn_not_a_card">کارت نیست</string>
+    <string name="learn_memory_empty">هنوز چیزی یاد نگرفته: بعد از هر عکس کارت‌ها را اصلاح کنید تا برنامه یادشان بگیرد.</string>
+    <string name="learn_memory_count">یادگرفته از شما: %1$d گوشهٔ کارت</string>
+    <string name="learn_memory_forget">فراموش کردن کارت‌های یادگرفته</string>
+    <string name="learn_memory_forget_confirm">هرچه برنامه از اصلاح‌های شما یاد گرفته پاک می‌شود (مثلاً وقتی طرح کارت‌های بازی کاملاً عوض شده).</string>
 </resources>
