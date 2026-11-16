@@ -184,7 +184,7 @@ final class LiveModel: ObservableObject {
     }
 
     func newHand() {
-        session.newHand()
+        session.doNewHand()
         phase = .idle
         photo = nil
         photoImage = nil
