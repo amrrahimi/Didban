@@ -89,4 +89,8 @@
     <string name="learn_memory_count">Learned from you: %1$d card corners</string>
     <string name="learn_memory_forget">Forget learned cards</string>
     <string name="learn_memory_forget_confirm">Everything the app learned from your corrections will be erased (useful if the game changed its card design completely).</string>
+    <string name="scan_manual_off">Manual mode (camera off)</string>
+    <string name="scan_manual_on">Manual mode on: tap + to choose cards · tap again to use the camera</string>
+    <string name="scan_new_photo">New photo (turn camera on)</string>
+    <string name="picker_ok">OK (%1$d of %2$d)</string>
 </resources>

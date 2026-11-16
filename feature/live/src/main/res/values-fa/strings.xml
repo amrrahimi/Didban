@@ -89,4 +89,8 @@
     <string name="learn_memory_count">یادگرفته از شما: %1$d گوشهٔ کارت</string>
     <string name="learn_memory_forget">فراموش کردن کارت‌های یادگرفته</string>
     <string name="learn_memory_forget_confirm">هرچه برنامه از اصلاح‌های شما یاد گرفته پاک می‌شود (مثلاً وقتی طرح کارت‌های بازی کاملاً عوض شده).</string>
+    <string name="scan_manual_off">حالت دستی (دوربین خاموش)</string>
+    <string name="scan_manual_on">حالت دستی روشن است: با + کارت‌ها را انتخاب کنید · برای دوربین دوباره بزنید</string>
+    <string name="scan_new_photo">عکس جدید (روشن کردن دوربین)</string>
+    <string name="picker_ok">تأیید (%1$d از %2$d)</string>
 </resources>

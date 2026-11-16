@@ -170,12 +170,26 @@ private fun ScanContent(viewModel: ScanViewModel) {
     var correcting by remember { mutableStateOf<Int?>(null) }
     var teaching by remember { mutableStateOf<Pair<Float, Float>?>(null) }
     var confirmForget by remember { mutableStateOf(false) }
+    val manualOnly by viewModel.manualOnly.collectAsStateWithLifecycle()
+    var picking by remember { mutableStateOf<ScanTarget?>(null) }
+    var cameraReady by remember { mutableStateOf(false) }
 
     val controller = remember { ScanCameraController(context.applicationContext) }
     var previewView by remember { mutableStateOf<PreviewView?>(null) }
     var cameraError by remember { mutableStateOf(false) }
     DisposableEffect(controller) { onDispose { controller.release() } }
-    LaunchedEffect(previewView) { previewView?.let { controller.bind(lifecycleOwner, it) { cameraError = true } } }
+    // The camera runs only while a photo is about to be taken: it turns off once the photo is in,
+    // while cards are chosen by hand, and in manual mode.
+    val cameraWanted = !manualOnly && picking == null && phase !is ScanPhase.Result
+    LaunchedEffect(previewView, cameraWanted) {
+        val view = previewView
+        if (cameraWanted && view != null) {
+            controller.bind(lifecycleOwner, view, onReady = { cameraReady = true }) { cameraError = true }
+        } else if (!cameraWanted) {
+            cameraReady = false
+            controller.stop()
+        }
+    }
 
     val scan: (ScanTarget) -> Unit = { target ->
         viewModel.onScanStarted(target)
@@ -184,7 +198,7 @@ private fun ScanContent(viewModel: ScanViewModel) {
 
     Column(Modifier.fillMaxSize()) {
         // Camera preview, or the analysed photo with boxes.
-        Box(Modifier.fillMaxWidth().weight(1f), contentAlignment = Alignment.Center) {
+        if (!manualOnly) Box(Modifier.fillMaxWidth().weight(1f), contentAlignment = Alignment.Center) {
             Box(Modifier.fillMaxWidth().aspectRatio(3f / 4f, matchHeightConstraintsFirst = true)) {
                 AndroidView(
                     factory = { ctx ->
@@ -200,6 +214,7 @@ private fun ScanContent(viewModel: ScanViewModel) {
                             }
                         }.also { previewView = it }
                     },
+                    onRelease = { if (previewView === it) previewView = null },
                     modifier = Modifier.fillMaxSize(),
                 )
                 when (val p = phase) {
@@ -223,11 +238,17 @@ private fun ScanContent(viewModel: ScanViewModel) {
 
         // Cards + advice + controls
         Column(
-            Modifier.fillMaxWidth().background(Color.Black).verticalScroll(rememberScrollState()).padding(12.dp),
+            Modifier.fillMaxWidth().then(if (manualOnly) Modifier.weight(1f) else Modifier)
+                .background(Color.Black).verticalScroll(rememberScrollState()).padding(12.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             (phase as? ScanPhase.Result)?.let { ResultBar(it, viewModel::acceptPending, viewModel::closeResult) }
-            CardsArea(table, onRemove = viewModel::remove, onAdd = viewModel::addManual)
+            FilterChip(
+                selected = manualOnly,
+                onClick = { viewModel.setManualOnly(!manualOnly) },
+                label = { Text(stringResource(if (manualOnly) R.string.scan_manual_on else R.string.scan_manual_off)) },
+            )
+            CardsArea(table, onRemove = viewModel::remove, onPick = { picking = it })
             AdvicePanel(table, analysis)
             if (table.variant == PokerVariant.FIVE_CARD_DRAW) {
                 FilterChip(
@@ -236,18 +257,26 @@ private fun ScanContent(viewModel: ScanViewModel) {
                     label = { Text(stringResource(R.string.scan_draw_done)) },
                 )
             }
-            val busy = phase is ScanPhase.Working || detector !is DetectorStatus.Ready
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                Button(onClick = { scan(ScanTarget.MINE) }, enabled = !busy, modifier = Modifier.weight(1f)) {
+            if (phase is ScanPhase.Result) {
+                Button(onClick = viewModel::closeResult, modifier = Modifier.fillMaxWidth()) {
                     Icon(Icons.Outlined.CameraAlt, contentDescription = null)
                     Spacer(Modifier.width(6.dp))
-                    Text(stringResource(R.string.scan_mine))
+                    Text(stringResource(R.string.scan_new_photo))
                 }
-                if (TableRules.tableScanAvailable(table.variant)) {
-                    Button(onClick = { scan(ScanTarget.TABLE) }, enabled = !busy, modifier = Modifier.weight(1f)) {
+            } else if (!manualOnly) {
+                val busy = phase is ScanPhase.Working || detector !is DetectorStatus.Ready || !cameraReady
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Button(onClick = { scan(ScanTarget.MINE) }, enabled = !busy, modifier = Modifier.weight(1f)) {
                         Icon(Icons.Outlined.CameraAlt, contentDescription = null)
                         Spacer(Modifier.width(6.dp))
-                        Text(stringResource(if (TableRules.usesBoard(table.variant)) R.string.scan_board else R.string.scan_upcards))
+                        Text(stringResource(R.string.scan_mine))
+                    }
+                    if (TableRules.tableScanAvailable(table.variant)) {
+                        Button(onClick = { scan(ScanTarget.TABLE) }, enabled = !busy, modifier = Modifier.weight(1f)) {
+                            Icon(Icons.Outlined.CameraAlt, contentDescription = null)
+                            Spacer(Modifier.width(6.dp))
+                            Text(stringResource(if (TableRules.usesBoard(table.variant)) R.string.scan_board else R.string.scan_upcards))
+                        }
                     }
                 }
             }
@@ -306,6 +335,22 @@ private fun ScanContent(viewModel: ScanViewModel) {
         )
     } else if (tap != null) {
         teaching = null
+    }
+    picking?.let { target ->
+        val free = when {
+            target == ScanTarget.MINE -> TableRules.mineCapacity(table.variant) - table.mine.size
+            TableRules.usesBoard(table.variant) -> TableRules.BOARD_CAPACITY - table.board.size
+            else -> TableRules.SEEN_CAPACITY - table.seen.size
+        }
+        CardPickerDialog(
+            variant = table.variant,
+            used = table.allCards,
+            title = stringResource(if (target == ScanTarget.MINE) R.string.live_my_cards else R.string.live_board),
+            maxSelect = free.coerceAtLeast(1),
+            onPickMany = { cards -> viewModel.addManual(cards, target); picking = null },
+            onPick = { card -> viewModel.addManual(card, target); picking = null },
+            onDismiss = { picking = null },
+        )
     }
     if (confirmForget) {
         AlertDialog(
@@ -415,17 +460,16 @@ private fun cardLabel(card: PlayingCard) =
     (if (card.rank == Rank.TEN) "10" else card.rank.symbol.toString()) + card.suit.glyph
 
 @Composable
-private fun CardsArea(table: TableState, onRemove: (PlayingCard) -> Unit, onAdd: (PlayingCard, ScanTarget) -> Unit) {
+private fun CardsArea(table: TableState, onRemove: (PlayingCard) -> Unit, onPick: (ScanTarget) -> Unit) {
     var pendingRemove by remember { mutableStateOf<PlayingCard?>(null) }
-    var picking by remember { mutableStateOf<ScanTarget?>(null) }
     val mineCap = TableRules.mineCapacity(table.variant)
     Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-        CardRow(stringResource(R.string.live_my_cards), table.mine, mineCap, { pendingRemove = it }) { picking = ScanTarget.MINE }
+        CardRow(stringResource(R.string.live_my_cards), table.mine, mineCap, { pendingRemove = it }) { onPick(ScanTarget.MINE) }
         when {
             TableRules.usesBoard(table.variant) ->
-                CardRow(stringResource(R.string.live_board), table.board, TableRules.BOARD_CAPACITY, { pendingRemove = it }) { picking = ScanTarget.TABLE }
+                CardRow(stringResource(R.string.live_board), table.board, TableRules.BOARD_CAPACITY, { pendingRemove = it }) { onPick(ScanTarget.TABLE) }
             table.variant == PokerVariant.SEVEN_CARD_STUD ->
-                CardRow(stringResource(R.string.scan_seen), table.seen, table.seen.size + 1, { pendingRemove = it }) { picking = ScanTarget.TABLE }
+                CardRow(stringResource(R.string.scan_seen), table.seen, table.seen.size + 1, { pendingRemove = it }) { onPick(ScanTarget.TABLE) }
             else -> Unit
         }
     }
@@ -435,14 +479,6 @@ private fun CardsArea(table: TableState, onRemove: (PlayingCard) -> Unit, onAdd:
             TextButton(onClick = { onRemove(card); pendingRemove = null }) { Text(stringResource(R.string.live_reject_yes)) }
             TextButton(onClick = { pendingRemove = null }) { Text(stringResource(R.string.live_reject_no)) }
         }
-    }
-    picking?.let { target ->
-        CardPickerDialog(
-            variant = table.variant,
-            used = table.allCards,
-            onPick = { onAdd(it, target); picking = null },
-            onDismiss = { picking = null },
-        )
     }
 }
 
@@ -478,8 +514,13 @@ private fun CardPickerDialog(
     onDismiss: () -> Unit,
     title: String? = null,
     onNotACard: (() -> Unit)? = null,
+    /** Above 1: cards are toggled on and confirmed together with OK (up to this many). */
+    maxSelect: Int = 1,
+    onPickMany: (List<PlayingCard>) -> Unit = { it.forEach(onPick) },
 ) {
     val deck = PokerEngines.forVariant(variant).deck
+    val multi = maxSelect > 1
+    var selected by remember { mutableStateOf(listOf<PlayingCard>()) }
     Dialog(onDismissRequest = onDismiss) {
         Surface(shape = RoundedCornerShape(16.dp), color = MaterialTheme.colorScheme.surface) {
             Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
@@ -492,14 +533,29 @@ private fun CardPickerDialog(
                         Rank.entries.reversed().filter { it in deck.ranks }.forEach { rank ->
                             val card = PlayingCard(rank, suit)
                             val isUsed = card in used
+                            val isSelected = card in selected
                             val color = if (suit.isRed) PokerColors.CardRed else PokerColors.CardBlack
                             Box(
                                 contentAlignment = Alignment.Center,
                                 modifier = Modifier
                                     .weight(1f)
                                     .height(40.dp)
-                                    .background(if (isUsed) Color.Gray else PokerColors.Ivory, RoundedCornerShape(4.dp))
-                                    .clickable(enabled = !isUsed) { onPick(card) }
+                                    .background(
+                                        when {
+                                            isUsed -> Color.Gray
+                                            isSelected -> PokerColors.Gold
+                                            else -> PokerColors.Ivory
+                                        },
+                                        RoundedCornerShape(4.dp),
+                                    )
+                                    .border(if (isSelected) 2.dp else 0.dp, if (isSelected) Color.Black else Color.Transparent, RoundedCornerShape(4.dp))
+                                    .clickable(enabled = !isUsed) {
+                                        when {
+                                            !multi -> onPick(card)
+                                            isSelected -> selected = selected - card
+                                            selected.size < maxSelect -> selected = selected + card
+                                        }
+                                    }
                                     .semantics { contentDescription = card.code },
                             ) {
                                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -513,6 +569,11 @@ private fun CardPickerDialog(
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
                     if (onNotACard != null) TextButton(onClick = onNotACard) { Text(stringResource(R.string.learn_not_a_card)) }
                     TextButton(onClick = onDismiss) { Text(stringResource(R.string.live_cancel)) }
+                    if (multi) {
+                        Button(onClick = { onPickMany(selected) }, enabled = selected.isNotEmpty()) {
+                            Text(stringResource(R.string.picker_ok, selected.size, maxSelect))
+                        }
+                    }
                 }
             }
         }

@@ -40,10 +40,14 @@ class ScanCameraController(private val context: Context) {
     @Volatile
     private var released = false
 
-    fun bind(owner: LifecycleOwner, previewView: PreviewView, onError: (Throwable) -> Unit) {
+    /** Increases on every [bind]/[stop] so a late bind callback doesn't restart a stopped camera. */
+    private var generation = 0
+
+    fun bind(owner: LifecycleOwner, previewView: PreviewView, onReady: () -> Unit = {}, onError: (Throwable) -> Unit) {
+        val myGeneration = ++generation
         val future = ProcessCameraProvider.getInstance(context)
         future.addListener({
-            if (released) return@addListener
+            if (released || myGeneration != generation) return@addListener
             try {
                 val p = future.get()
                 provider = p
@@ -64,6 +68,7 @@ class ScanCameraController(private val context: Context) {
                 p.unbindAll()
                 camera = p.bindToLifecycle(owner, CameraSelector.DEFAULT_BACK_CAMERA, preview, capture)
                 imageCapture = capture
+                onReady()
             } catch (e: Exception) {
                 onError(e)
             }
@@ -114,6 +119,14 @@ class ScanCameraController(private val context: Context) {
         val control = camera?.cameraControl ?: return
         val point = previewView.meteringPointFactory.createPoint(x, y)
         control.startFocusAndMetering(FocusMeteringAction.Builder(point).setAutoCancelDuration(5, TimeUnit.SECONDS).build())
+    }
+
+    /** Turns the camera off (after a photo, while choosing cards by hand). [bind] turns it on again. */
+    fun stop() {
+        generation++
+        imageCapture = null
+        camera = null
+        provider?.unbindAll()
     }
 
     fun release() {

@@ -91,6 +91,16 @@ class ScanViewModel @Inject constructor(
     private val _detector = MutableStateFlow<DetectorStatus>(DetectorStatus.Loading)
     val detectorStatus: StateFlow<DetectorStatus> = _detector.asStateFlow()
 
+    private val _manualOnly = MutableStateFlow(false)
+
+    /** "Manual" mode: the camera stays off and cards are chosen by hand. */
+    val manualOnly: StateFlow<Boolean> = _manualOnly.asStateFlow()
+
+    fun setManualOnly(on: Boolean) {
+        if (on) closeResult()
+        _manualOnly.value = on
+    }
+
     /** Number of symbol examples the app has learned from the user. */
     val learnedExamples: StateFlow<Int> = reader.examples
 
@@ -260,6 +270,10 @@ class ScanViewModel @Inject constructor(
     fun remove(card: PlayingCard) = _table.update { TableRules.remove(it, card) }
 
     fun addManual(card: PlayingCard, target: ScanTarget) = _table.update { TableRules.add(it, card, target) }
+
+    /** Several cards chosen at once in the picker (in the order they were tapped). */
+    fun addManual(cards: List<PlayingCard>, target: ScanTarget) =
+        _table.update { cards.fold(it) { t, c -> TableRules.add(t, c, target) } }
 
     fun setOpponents(n: Int) = _table.update { TableRules.setOpponents(it, n) }
 
