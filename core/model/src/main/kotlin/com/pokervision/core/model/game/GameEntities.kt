@@ -2,6 +2,7 @@ package com.pokervision.core.model.game
 
 import com.pokervision.core.model.confidence.Observed
 import com.pokervision.core.model.detection.BoundingBox
+import kotlin.jvm.JvmInline
 
 /** Non-negative chip amount in the table's smallest unit. */
 @JvmInline

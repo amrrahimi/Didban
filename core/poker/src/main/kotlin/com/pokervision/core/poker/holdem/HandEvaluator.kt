@@ -1,6 +1,7 @@
 package com.pokervision.core.poker.holdem
 
 import com.pokervision.core.model.card.PlayingCard
+import kotlin.jvm.JvmInline
 
 /** Poker hand categories, weakest first in standard poker. */
 enum class HandCategory {

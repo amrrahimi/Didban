@@ -1,5 +1,7 @@
 package com.pokervision.core.model.confidence
 
+import kotlin.jvm.JvmInline
+
 /** Probability-like confidence score in [0, 1]. */
 @JvmInline
 value class Confidence(val value: Float) : Comparable<Confidence> {
