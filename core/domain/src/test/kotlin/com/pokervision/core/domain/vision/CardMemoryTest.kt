@@ -50,6 +50,21 @@ class CardMemoryTest {
     }
 
     @Test
+    fun `a box one or two pixels off still matches the same card best`() {
+        val a = feature(shapeA)
+        val shifted = feature(shapeA.map { intArrayOf(it[0] + 1, it[1] + 2, it[2] + 1, it[3] + 2) })
+        val four = feature(shapeFour)
+        assertTrue(GlyphFeatures.shiftedSimilarity(a, shifted) > MemoryRecognizer.STRONG_SIMILARITY)
+        assertTrue(GlyphFeatures.shiftedSimilarity(shifted, four) < GlyphFeatures.shiftedSimilarity(shifted, a) - 0.2f)
+        val memory = CardMemory()
+        memory.learn(PlayingCard.parse("AS"), a)
+        memory.learn(PlayingCard.parse("4S"), four)
+        val m = memory.match(shifted)!!
+        assertEquals(PlayingCard.parse("AS"), m.card)
+        assertEquals(PlayingCard.parse("AS"), MemoryRecognizer.decide(PlayingCard.parse("4S"), 0.7f, m).card)
+    }
+
+    @Test
     fun `upside down corner still matches`() {
         val a = feature(shapeA)
         val turned = GlyphFeature(a.gray.reversedArray(), a.redness)

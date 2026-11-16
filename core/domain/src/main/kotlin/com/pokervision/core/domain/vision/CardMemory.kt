@@ -46,6 +46,7 @@ object GlyphFeatures {
             ink += darkness
             redInk += darkness * ((r - (gr + b) / 2f).coerceAtLeast(0f) / 255f)
         }
+        blur(g)
         val mean = g.average().toFloat()
         var norm = 0f
         for (i in 0 until SIZE) {
@@ -57,6 +58,24 @@ object GlyphFeatures {
         for (i in 0 until SIZE) g[i] /= norm
         val redness = if (ink < 1e-3f) 0f else (redInk / ink * 4f).coerceIn(0f, 1f)
         return GlyphFeature(g, redness)
+    }
+
+    /** 3x3 box blur in place: makes matching tolerant to the box being a pixel or two off. */
+    private fun blur(g: FloatArray) {
+        val src = g.copyOf()
+        for (y in 0 until HEIGHT) for (x in 0 until WIDTH) {
+            var sum = 0f
+            var n = 0
+            for (dy in -1..1) for (dx in -1..1) {
+                val xx = x + dx
+                val yy = y + dy
+                if (xx in 0 until WIDTH && yy in 0 until HEIGHT) {
+                    sum += src[yy * WIDTH + xx]
+                    n++
+                }
+            }
+            g[y * WIDTH + x] = sum / n
+        }
     }
 
     /**
@@ -73,6 +92,34 @@ object GlyphFeatures {
         }
         return max(direct, turned) - REDNESS_PENALTY * abs(a.redness - b.redness)
     }
+
+    /**
+     * Like [similarity] but also tries moving one patch up to [MAX_SHIFT] pixels in each direction:
+     * the model's boxes around the same symbol differ by a pixel or two between photos.
+     */
+    fun shiftedSimilarity(a: GlyphFeature, b: GlyphFeature): Float {
+        var best = -2f
+        for (dy in -MAX_SHIFT..MAX_SHIFT) for (dx in -MAX_SHIFT..MAX_SHIFT) {
+            var direct = 0f
+            var turned = 0f
+            for (y in 0 until HEIGHT) {
+                val yy = y + dy
+                if (yy < 0 || yy >= HEIGHT) continue
+                for (x in 0 until WIDTH) {
+                    val xx = x + dx
+                    if (xx < 0 || xx >= WIDTH) continue
+                    val av = a.gray[y * WIDTH + x]
+                    val j = yy * WIDTH + xx
+                    direct += av * b.gray[j]
+                    turned += av * b.gray[SIZE - 1 - j]
+                }
+            }
+            best = max(best, max(direct, turned))
+        }
+        return best - REDNESS_PENALTY * abs(a.redness - b.redness)
+    }
+
+    const val MAX_SHIFT = 2
 }
 
 data class MemoryMatch(val card: PlayingCard, val similarity: Float, val runnerUpSimilarity: Float)
@@ -98,7 +145,11 @@ class CardMemory(private val perCard: Int = DEFAULT_PER_CARD) {
     /** Best matching card and the best score of any *other* card (to judge how clear the match is). */
     fun match(feature: GlyphFeature): MemoryMatch? {
         if (examples.isEmpty()) return null
-        val best = examples.mapValues { (_, list) -> list.maxOf { GlyphFeatures.similarity(feature, it) } }
+        // Quick pass without shifting, then a careful (shift-tolerant) pass on the likeliest cards.
+        val best = HashMap(examples.mapValues { (_, list) -> list.maxOf { GlyphFeatures.similarity(feature, it) } })
+        best.entries.sortedByDescending { it.value }.take(CAREFUL_CANDIDATES).forEach { (card, _) ->
+            best[card] = examples.getValue(card).maxOf { GlyphFeatures.shiftedSimilarity(feature, it) }
+        }
         val top = best.maxBy { it.value }
         val runnerUp = best.filterKeys { it != top.key }.values.maxOrNull() ?: -1f
         return MemoryMatch(top.key, top.value, runnerUp)
@@ -111,7 +162,7 @@ class CardMemory(private val perCard: Int = DEFAULT_PER_CARD) {
     fun unlearn(card: PlayingCard, feature: GlyphFeature, minSimilarity: Float = UNLEARN_SIMILARITY): Int {
         val list = examples[card] ?: return 0
         val before = list.size
-        list.removeAll { GlyphFeatures.similarity(feature, it) >= minSimilarity }
+        list.removeAll { GlyphFeatures.shiftedSimilarity(feature, it) >= minSimilarity }
         if (list.isEmpty()) examples.remove(card)
         return before - list.size
     }
@@ -142,6 +193,7 @@ class CardMemory(private val perCard: Int = DEFAULT_PER_CARD) {
     companion object {
         const val DEFAULT_PER_CARD = 12
         const val UNLEARN_SIMILARITY = 0.75f
+        private const val CAREFUL_CANDIDATES = 6
         private const val FORMAT = 1
 
         /** Restores a memory; returns an empty memory for unknown or damaged data. */
