@@ -389,13 +389,25 @@ struct AdvicePanel: View {
             Text(tr("scan_draw_advice", keep.isEmpty ? "—" : keep.map(label).joined(separator: " "), Int(a.drawDiscardCount)))
                 .font(.system(size: 18, weight: .bold))
         }
-        Text(actionTitle(a)).font(.system(size: 30, weight: .bold)).foregroundColor(actionColor(a))
+        // Action and chance to win side by side, both large and in the action's colour.
+        HStack(alignment: .center) {
+            Text(actionTitle(a)).font(.system(size: 30, weight: .bold)).foregroundColor(actionColor(a))
+            Spacer()
+            VStack(alignment: .trailing, spacing: 0) {
+                Text(tr("ios_percent", Int(a.equityPercent)))
+                    .font(.system(size: 34, weight: .bold))
+                    .foregroundColor(actionColor(a))
+                Text(tr("live_chance_label") + " " + (a.plusMinusPercent < 0 ? tr("live_chance_exact") : tr("live_chance_estimate", tr("ios_percent", Int(a.plusMinusPercent)))))
+                    .font(.caption2)
+                    .foregroundColor(actionColor(a).opacity(0.85))
+            }
+        }
         Text(detail(a)).font(.subheadline)
-        let pct = tr("ios_percent", Int(a.equityPercent))
-        let line = a.plusMinusPercent < 0 ? tr("live_equity_exact", pct) : tr("live_equity_estimate", pct, tr("ios_percent", Int(a.plusMinusPercent)))
-        Text(line + (a.handKey.isEmpty ? "" : " · " + tr("hand_" + a.handKey)))
-            .font(.caption)
-            .foregroundColor(.white.opacity(0.85))
+        if !a.handKey.isEmpty {
+            Text(tr("live_current_hand", tr("hand_" + a.handKey)))
+                .font(.caption)
+                .foregroundColor(.white.opacity(0.85))
+        }
         if a.hiLo {
             Text(tr("scan_hilo_note")).font(.caption).foregroundColor(.white.opacity(0.7))
         }

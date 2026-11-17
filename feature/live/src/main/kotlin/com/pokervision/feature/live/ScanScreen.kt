@@ -621,16 +621,30 @@ private fun ReadyAdvice(a: HandAnalysis) {
             fontWeight = FontWeight.Bold,
         )
     }
-    Text(
-        title,
-        color = color,
-        fontSize = 28.sp,
-        fontWeight = FontWeight.Bold,
-        modifier = Modifier.semantics {
-            liveRegion = LiveRegionMode.Polite
-            contentDescription = title
-        },
-    )
+    // Action and chance to win side by side, both large and in the action's colour.
+    val pct = percent(a.heroEquity)
+    val margin = a.estimateHalfWidth?.let { stringResource(R.string.live_chance_estimate, percent(it)) }
+        ?: stringResource(R.string.live_chance_exact)
+    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+        Text(
+            title,
+            color = color,
+            fontSize = 30.sp,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.weight(1f).semantics {
+                liveRegion = LiveRegionMode.Polite
+                contentDescription = title
+            },
+        )
+        Column(horizontalAlignment = Alignment.End) {
+            Text(pct, color = color, fontSize = 34.sp, fontWeight = FontWeight.Bold)
+            Text(
+                stringResource(R.string.live_chance_label) + " " + margin,
+                color = color.copy(alpha = 0.85f),
+                style = MaterialTheme.typography.labelSmall,
+            )
+        }
+    }
     val max = advice.maxCallBetFraction
     Text(
         when (advice.action) {
@@ -643,11 +657,13 @@ private fun ReadyAdvice(a: HandAnalysis) {
         color = Color.White,
         style = MaterialTheme.typography.bodyMedium,
     )
-    val pct = percent(a.heroEquity)
-    val line = a.estimateHalfWidth?.let { stringResource(R.string.live_equity_estimate, pct, percent(it)) }
-        ?: stringResource(R.string.live_equity_exact, pct)
-    val handName = a.currentHand?.let { " · " + stringResource(it.labelRes()) } ?: ""
-    Text(line + handName, color = Color.White.copy(alpha = 0.85f), style = MaterialTheme.typography.bodySmall)
+    a.currentHand?.let {
+        Text(
+            stringResource(R.string.live_current_hand, stringResource(it.labelRes())),
+            color = Color.White.copy(alpha = 0.85f),
+            style = MaterialTheme.typography.bodySmall,
+        )
+    }
     if (a.variant == PokerVariant.OMAHA_HI_LO) {
         Text(stringResource(R.string.scan_hilo_note), color = Color.White.copy(alpha = 0.7f), style = MaterialTheme.typography.bodySmall)
     }

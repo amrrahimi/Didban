@@ -93,4 +93,8 @@
     <string name="scan_manual_on">حالت دستی روشن است: با + کارت‌ها را انتخاب کنید · برای دوربین دوباره بزنید</string>
     <string name="scan_new_photo">عکس جدید (روشن کردن دوربین)</string>
     <string name="picker_ok">تأیید (%1$d از %2$d)</string>
+    <string name="live_chance_label">شانس برد</string>
+    <string name="live_chance_exact">(دقیق)</string>
+    <string name="live_chance_estimate">(±%1$s)</string>
+    <string name="live_current_hand">دست فعلی شما: %1$s</string>
 </resources>

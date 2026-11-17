@@ -93,4 +93,8 @@
     <string name="scan_manual_on">Manual mode on: tap + to choose cards · tap again to use the camera</string>
     <string name="scan_new_photo">New photo (turn camera on)</string>
     <string name="picker_ok">OK (%1$d of %2$d)</string>
+    <string name="live_chance_label">chance to win</string>
+    <string name="live_chance_exact">(exact)</string>
+    <string name="live_chance_estimate">(±%1$s)</string>
+    <string name="live_current_hand">Your hand now: %1$s</string>
 </resources>

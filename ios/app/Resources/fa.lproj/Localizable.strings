@@ -67,3 +67,7 @@
 "variant_SHORT_DECK" = "شورت دک (۶+)";
 "ios_camera_denied" = "اجازهٔ دوربین داده نشده. از Settings ← Poker Vision دوربین را روشن کنید، یا از حالت دستی استفاده کنید.";
 "ios_percent" = "%1$d٪";
+"live_chance_label" = "شانس برد";
+"live_chance_exact" = "(دقیق)";
+"live_chance_estimate" = "(±%1$@)";
+"live_current_hand" = "دست فعلی شما: %1$@";

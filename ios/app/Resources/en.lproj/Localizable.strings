@@ -67,3 +67,7 @@
 "variant_SHORT_DECK" = "Short Deck (6+)";
 "ios_camera_denied" = "Camera access is off. Turn it on in Settings → Poker Vision, or use manual mode.";
 "ios_percent" = "%1$d%%";
+"live_chance_label" = "chance to win";
+"live_chance_exact" = "(exact)";
+"live_chance_estimate" = "(±%1$@)";
+"live_current_hand" = "Your hand now: %1$@";
